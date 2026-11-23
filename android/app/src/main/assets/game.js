@@ -129,7 +129,6 @@ function setupInput(){
  sprint.addEventListener("pointerdown",function(e){e.preventDefault();state.sprint=true;sprint.setPointerCapture(e.pointerId);});
  function stopSprint(){state.sprint=false;}
  sprint.addEventListener("pointerup",stopSprint);sprint.addEventListener("pointercancel",stopSprint);sprint.addEventListener("lostpointercapture",stopSprint);
- window.addEventListener("resize",resizeCanvas);
  resizeCanvas();
 }
 function resizeCanvas(){
@@ -171,8 +170,8 @@ function nearestPlayers(teamId,x,y,omit){
 function ownPlayer(){return state.game&&state.game.players[state.game.selected];}
 function inputVec(){
  var k=state.keys,x=state.joy.x,y=state.joy.y;
- if(k.ArrowLeft||k.a)x-=1;if(k.ArrowRight||k.d)x+=1;
- if(k.ArrowUp||k.w)y-=1;if(k.ArrowDown||k.s)y+=1;
+ if(k.ArrowLeft)x-=1;if(k.ArrowRight)x+=1;
+ if(k.ArrowUp)y-=1;if(k.ArrowDown)y+=1;
  var len=Math.hypot(x,y);if(len>1){x/=len;y/=len;}
  return {x:x,y:y};
 }
@@ -375,5 +374,6 @@ window.addEventListener("keydown",function(e){
 });
 window.addEventListener("keyup",function(e){state.keys[e.key]=false;});
 window.addEventListener("blur",function(){state.keys={};state.joy.x=0;state.joy.y=0;state.sprint=false;});
+window.addEventListener("resize",resizeCanvas);
 restore();render();
 })();

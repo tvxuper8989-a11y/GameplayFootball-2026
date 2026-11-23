@@ -29,7 +29,7 @@ public final class MainActivity extends Activity {
         gameView.setBackgroundColor(Color.rgb(3, 13, 26));
         WebSettings settings = gameView.getSettings();
         settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(false);
+        settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(false);
         settings.setMediaPlaybackRequiresUserGesture(true);

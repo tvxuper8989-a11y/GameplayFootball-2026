@@ -33,6 +33,8 @@ jobs:
           test -n "$SDKMGR"
           yes | "$SDKMGR" --licenses >/dev/null || true
           "$SDKMGR" "platforms;android-35" "build-tools;35.0.0"
+      - name: Probar navegación y partido JavaScript
+        run: node android/test-ui-smoke.js
       - name: Compilar APK instalable de depuración
         run: gradle -p android :app:assembleDebug --no-daemon --stacktrace
       - name: Validar que se haya generado APK
