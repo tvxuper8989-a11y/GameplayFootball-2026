@@ -288,7 +288,9 @@ int main(int argc, const char** argv) {
   // database
 
   db = new Database();
-  bool dbSuccess = db->Load("databases/default/database.sqlite");
+  // Optional 2026 season pack. Keep the default database unchanged.
+  const std::string databaseFilename = config->Get("database_filename", "databases/default/database.sqlite");
+  bool dbSuccess = db->Load(databaseFilename);
   if (!dbSuccess) Log(e_FatalError, "main", "()", "Could not open database");
 
 
