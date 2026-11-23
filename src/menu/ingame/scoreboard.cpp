@@ -9,6 +9,8 @@
 #include <SDL2/SDL.h>
 
 #include "../../onthepitch/match.hpp"
+#include "../../main.hpp"
+#include <boost/filesystem.hpp>
 
 using namespace blunted;
 
@@ -44,7 +46,9 @@ Gui2ScoreBoard::Gui2ScoreBoard(Gui2WindowManager *windowManager, Match *match) :
   float bgAlpha = 100.0f;
 
   Gui2Image *bg = new Gui2Image(windowManager, "image_scoreboard_bg", 0, 0, xOffset[8] + 1, height_percent);
-  bg->LoadImage("media/menu/scoreboard_bg.png");
+  std::string scoreboardImage = GetConfiguration()->Get("scoreboard_background", "media/menu/scoreboard_bg.png");
+  if (!boost::filesystem::exists(scoreboardImage)) scoreboardImage = "media/menu/scoreboard_bg.png";
+  bg->LoadImage(scoreboardImage);
   this->AddView(bg);
   bg->Show();
 

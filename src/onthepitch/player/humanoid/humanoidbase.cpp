@@ -3,6 +3,7 @@
 // i do not offer support, so don't ask. to be used for inspiration :)
 
 #include <cmath>
+#include <boost/filesystem.hpp>
 #include "humanoid.hpp"
 
 #include "humanoid_utils.hpp"
@@ -108,6 +109,13 @@ HumanoidBase::HumanoidBase(PlayerBase *player, Match *match, boost::intrusive_pt
   boost::intrusive_ptr < Resource<Surface> > skin;
   skin = ResourceManagerPool::GetInstance().GetManager<Surface>(e_ResourceType_Surface)->Fetch("media/objects/players/textures/skin0" + int_to_str(player->GetPlayerData()->GetSkinColor()) + ".png", true, true);
 
+  // Global optional boot texture for the 2026-27 graphic pack.
+  boost::intrusive_ptr < Resource<Surface> > bootTexture;
+  std::string bootTextureFile = GetConfiguration()->Get("boot_texture", "");
+  if (!bootTextureFile.empty() && boost::filesystem::exists(bootTextureFile)) {
+    bootTexture = ResourceManagerPool::GetInstance().GetManager<Surface>(e_ResourceType_Surface)->Fetch(bootTextureFile, true, true);
+  }
+
   boost::intrusive_ptr<Node> bla2(new Node(*fullbodySourceNode.get(), int_to_str(player->GetID()), GetScene3D()));
   fullbodyNode = bla2;
   fullbodyNode->SetLocalMode(e_LocalMode_Absolute);
@@ -118,6 +126,10 @@ HumanoidBase::HumanoidBase(PlayerBase *player, Match *match, boost::intrusive_pt
   std::vector < MaterializedTriangleMesh > &tmesh = bodyGeom->GetResource()->GetTriangleMeshesRef();
   for (unsigned int i = 0; i < tmesh.size(); i++) {
     if (tmesh.at(i).material.diffuseTexture != boost::intrusive_ptr< Resource<Surface> >()) {
+      if (bootTexture != boost::intrusive_ptr < Resource<Surface> >() &&
+          tmesh.at(i).material.diffuseTexture->GetIdentString() == "shoe.jpg") {
+        tmesh.at(i).material.diffuseTexture = bootTexture;
+      }
       if (tmesh.at(i).material.diffuseTexture->GetIdentString() == "skin.jpg") {
         tmesh.at(i).material.diffuseTexture = skin;
         tmesh.at(i).material.specular_amount = 0.002f;

@@ -3,6 +3,7 @@
 // i do not offer support, so don't ask. to be used for inspiration :)
 
 #include "match.hpp"
+#include <boost/filesystem.hpp>
 
 #include "../main.hpp"
 
@@ -178,7 +179,9 @@ Match::Match(MatchData *matchData, const std::vector<IHIDevice*> &controllers) :
 
   boost::intrusive_ptr<Node> tmpStadiumNode;
   if (!SuperDebug()) {
-    tmpStadiumNode = loader.LoadObject(GetScene3D(), "media/objects/stadiums/test/test.object");
+    std::string stadiumObject = GetConfiguration()->Get("stadium_object", "media/objects/stadiums/test/test.object");
+    if (!boost::filesystem::exists(stadiumObject)) stadiumObject = "media/objects/stadiums/test/test.object";
+    tmpStadiumNode = loader.LoadObject(GetScene3D(), stadiumObject);
     RandomizeAdboards(tmpStadiumNode);
   }
   if (SuperDebug()) tmpStadiumNode = loader.LoadObject(GetScene3D(), "media/objects/stadiums/test/pitchonly.object");

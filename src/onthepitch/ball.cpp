@@ -5,6 +5,7 @@
 #include "ball.hpp"
 
 #include <cmath>
+#include <boost/filesystem.hpp>
 
 #include "utils/objectloader.hpp"
 #include "scene/objectfactory.hpp"
@@ -35,7 +36,9 @@ Ball::Ball(Match *match) : match(match) {
   Log(e_Notice, "Ball", "Ball", "Loading ball object");
 
   ObjectLoader loader;
-  ballNode = loader.LoadObject(scene3D, "media/objects/balls/generic.object");
+  std::string ballObject = GetConfiguration()->Get("ball_object", "media/objects/balls/generic.object");
+  if (!boost::filesystem::exists(ballObject)) ballObject = "media/objects/balls/generic.object";
+  ballNode = loader.LoadObject(scene3D, ballObject);
   match->GetDynamicNode()->AddNode(ballNode);
 
   std::list < boost::intrusive_ptr<Geometry> > children;

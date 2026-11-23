@@ -88,7 +88,8 @@ void Team::InitPlayers(boost::intrusive_ptr<Node> fullbodyNode, std::map<Vector3
         kitFilename = GetTeamData()->GetKitUrl() + "_kit_0" + int_to_str(GetMenuTask()->GetTeamKitNum(GetID())) + ".png";
         if (!boost::filesystem::exists(kitFilename)) kitFilename = (GetID() == 0) ? "media/textures/almost_white.png" : "media/textures/almost_black.png";
       } else {
-        kitFilename = "media/objects/players/textures/goalie_kit.png";
+        kitFilename = GetTeamData()->GetKitUrl() + "_kit_gk.png";
+        if (!boost::filesystem::exists(kitFilename)) kitFilename = "media/objects/players/textures/goalie_kit.png";
       }
       kit = ResourceManagerPool::GetInstance().GetManager<Surface>(e_ResourceType_Surface)->Fetch(kitFilename);
       player->Activate(playerNode, fullbodyNode, colorCoords, kit, match->GetAnimCollection());
