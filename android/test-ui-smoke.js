@@ -40,5 +40,7 @@ win.passBall();win.switchPlayer();win.shootBall();
 win.pauseGame();assert.ok(element("overlay").innerHTML.includes("PAUSA"));
 win.openTactics();win.tacticInGame("4-4-2");win.closeModal();
 win.mobileBack();win.mobileBack();
-assert.ok(app.innerHTML.includes("JUGAR AHORA") || app.innerHTML.includes("CONTINUAR"));
+assert.ok(element("overlay").innerHTML.includes("CONTINUAR"));
+win.go("home");
+assert.ok(app.innerHTML.includes("JUGAR AHORA"));
 console.log("OK: pantallas, render Canvas, controles, pausa, táctica y navegación");
