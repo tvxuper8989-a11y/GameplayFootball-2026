@@ -3,6 +3,7 @@
 // i do not offer support, so don't ask. to be used for inspiration :)
 
 #ifdef WIN32
+#include <algorithm>
 #include <windows.h>
 #endif
 

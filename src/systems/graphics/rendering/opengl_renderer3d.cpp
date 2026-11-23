@@ -76,7 +76,7 @@ struct GLfunctions {
 
   void OpenGLRenderer3D::SwapBuffers() {
     // Optional upper frame-rate limit (not guaranteed FPS). Physics stays at 10ms.
-    const int requested = GetConfiguration()->GetInt("graphics_fps_limit", 0);
+    static const int requested = GetConfiguration()->GetInt("graphics_fps_limit", 0);
     static std::chrono::steady_clock::time_point deadline;
     if (requested > 0) {
       const int fps = std::max(20, std::min(120, requested));

@@ -6,6 +6,7 @@
 
 #include "../pagefactory.hpp"
 #include <SDL2/SDL.h>
+#include <algorithm>
 
 #include "main.hpp"
 
@@ -85,8 +86,10 @@ void GamePage::Process() {
   const unsigned int now_ms = SDL_GetTicks();
   if (fpsCaption && now_ms - lastFPSUpdate_ms >= 1000) {
     const int frame_ms = GetGraphicsSystem()->GetAverageFrameTime_ms(60);
-    fpsCaption->SetCaption(frame_ms > 0
-       ? "FPS " + int_to_str(std::min(999, 1000 / frame_ms)) : "FPS --");
+    const int measured = frame_ms > 0 ? std::min(999, 1000 / frame_ms) : 0;
+    const int limit = GetConfiguration()->GetInt("graphics_fps_limit", 0);
+    const int shown = limit > 0 ? std::min(measured, limit) : measured;
+    fpsCaption->SetCaption(frame_ms > 0 ? "FPS " + int_to_str(shown) : "FPS --");
     lastFPSUpdate_ms = now_ms;
   }
 }
