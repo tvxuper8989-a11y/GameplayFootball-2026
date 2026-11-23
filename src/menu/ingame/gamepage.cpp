@@ -5,6 +5,7 @@
 #include "gamepage.hpp"
 
 #include "../pagefactory.hpp"
+#include <SDL2/SDL.h>
 
 #include "main.hpp"
 
@@ -17,8 +18,16 @@
 using namespace blunted;
 
 GamePage::GamePage(Gui2WindowManager *windowManager, const Gui2PageData &pageData) : Gui2Page(windowManager, pageData), match(0) {
+  fpsCaption = 0;
+  lastFPSUpdate_ms = 0;
+  if (GetConfiguration()->GetBool("show_fps", true)) {
+    fpsCaption = new Gui2Caption(windowManager, "fps_indicator", 89, 1.2f, 9, 2.2f, "FPS --");
+    fpsCaption->SetColor(Vector3(203, 234, 230));
+    this->AddView(fpsCaption);
+    fpsCaption->Show();
+  }
 
-  Gui2Caption *betaSign = new Gui2Caption(windowManager, "caption_betasign", 0, 0, 0, 2, "gameplay football public beta 2 v0.2");
+  Gui2Caption *betaSign = new Gui2Caption(windowManager, "caption_betasign", 0, 0, 0, 2, "GAMEPLAY FOOTBALL 2026 / 27");
   betaSign->SetColor(Vector3(180, 180, 180));
   betaSign->SetTransparency(0.3f);
   this->AddView(betaSign);
@@ -72,6 +81,14 @@ void GamePage::Process() {
     GetGameTask()->matchLifetimeMutex.unlock();
   }
 
+  // Display the actual measured frame rate, not just the configured target.
+  const unsigned int now_ms = SDL_GetTicks();
+  if (fpsCaption && now_ms - lastFPSUpdate_ms >= 1000) {
+    const int frame_ms = GetGraphicsSystem()->GetAverageFrameTime_ms(60);
+    fpsCaption->SetCaption(frame_ms > 0
+       ? "FPS " + int_to_str(std::min(999, 1000 / frame_ms)) : "FPS --");
+    lastFPSUpdate_ms = now_ms;
+  }
 }
 
 void GamePage::GoShortReplayPage() {

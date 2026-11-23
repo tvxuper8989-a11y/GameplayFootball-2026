@@ -7,6 +7,7 @@
 #include "../windowmanager.hpp"
 
 #include "SDL2/SDL2_rotozoom.h"
+#include <cctype>
 
 namespace blunted {
 
@@ -124,7 +125,8 @@ namespace blunted {
     if (adaptedCaption.compare("") == 0) adaptedCaption = " ";
     if (caption.compare(adaptedCaption) != 0) {
       caption = adaptedCaption;
-      std::transform(caption.begin(), caption.end(), caption.begin(), ::toupper);
+      std::transform(caption.begin(), caption.end(), caption.begin(),
+                     [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
       Redraw();
     }
   }

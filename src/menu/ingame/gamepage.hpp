@@ -8,6 +8,7 @@
 #include "utils/gui2/windowmanager.hpp"
 
 #include "utils/gui2/page.hpp"
+#include "utils/gui2/widgets/caption.hpp"
 
 class Match;
 
@@ -33,6 +34,8 @@ class GamePage : public Gui2Page {
 
   protected:
     Match *match;
+    Gui2Caption *fpsCaption;
+    unsigned int lastFPSUpdate_ms;
 
 };
 

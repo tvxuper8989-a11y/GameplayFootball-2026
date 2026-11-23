@@ -7,6 +7,7 @@
 #include "utils/gui2/windowmanager.hpp"
 
 #include <SDL2/SDL.h>
+#include <algorithm>
 
 #include "../../onthepitch/match.hpp"
 #include "../../main.hpp"
@@ -14,95 +15,59 @@
 
 using namespace blunted;
 
-Gui2ScoreBoard::Gui2ScoreBoard(Gui2WindowManager *windowManager, Match *match) : Gui2View(windowManager, "scoreboard", 2, 2, 96, 4), match(match) {
+Gui2ScoreBoard::Gui2ScoreBoard(Gui2WindowManager *windowManager, Match *match)
+    : Gui2View(windowManager, "scoreboard", 2, 2, 96, 5.5f), match(match) {
   x_percent = 2;
   y_percent = 2;
   width_percent = 96;
-  height_percent = 4;
+  height_percent = 5.5f;
+  goalCount[0] = goalCount[1] = 0;
 
-  Vector3 textColor = 255;
-  Vector3 textOutlineColor = 0;
-
-  goalCount[0] = 0;
-  goalCount[1] = 0;
+  // Minimal television graphic: dark navy bar, slim mint edge, white score cell.
+  Gui2Image *bar = new Gui2Image(windowManager, "tv_bar", 0, 0, 61, 5.5f);
   int x, y, w, h;
-  windowManager->GetCoordinates(x_percent, y_percent, width_percent, height_percent, x, y, w, h);
+  windowManager->GetCoordinates(0, 0, 61, 5.5f, x, y, w, h);
+  bar->GetImage2D()->DrawRectangle(0, 0, w, h, Vector3(7, 25, 43), 250);
+  bar->GetImage2D()->DrawRectangle(0, 0, w, std::max(1, h / 13), Vector3(87, 211, 194), 255);
+  bar->GetImage2D()->OnChange();
+  this->AddView(bar);
+  bar->Show();
 
-  // percentages
-  float xOffset[9];
-  xOffset[0] = 1; // league logo
-  xOffset[1] = 5; // time
-  xOffset[2] = 15; // t1 logo
-  xOffset[3] = 19; // t1 name
-  xOffset[4] = 25; // t1 score
-  xOffset[5] = 29; // t2 logo
-  xOffset[6] = 33; // t2 name
-  xOffset[7] = 39; // t2 score
-  xOffset[8] = 43; // end
-  float relToAbsMultiplier = w / (width_percent * 1.0f);
-  content_yOffset = 0.2f;
-  float content_xOffset = 0.2f;
+  Gui2Image *scoreBox = new Gui2Image(windowManager, "tv_score_box", 26, 0.65f, 10, 4.1f);
+  windowManager->GetCoordinates(0, 0, 10, 4.1f, x, y, w, h);
+  scoreBox->GetImage2D()->DrawRectangle(0, 0, w, h, Vector3(227, 246, 244), 255);
+  scoreBox->GetImage2D()->OnChange();
+  this->AddView(scoreBox);
+  scoreBox->Show();
 
-  float bgAlpha = 100.0f;
+  timeCaption = new Gui2Caption(windowManager, "tv_clock", 1.3f, 1.2f, 8.3f, 2.9f, "00:00");
+  teamNameCaption[0] = new Gui2Caption(windowManager, "tv_t1", 14, 1.2f, 10.5f, 2.9f,
+                           match->GetTeam(0)->GetTeamData()->GetShortName());
+  teamNameCaption[1] = new Gui2Caption(windowManager, "tv_t2", 38, 1.2f, 10.5f, 2.9f,
+                           match->GetTeam(1)->GetTeamData()->GetShortName());
+  goalCountCaption[0] = new Gui2Caption(windowManager, "tv_g1", 27, 1.0f, 3.5f, 3.2f, "0");
+  goalCountCaption[1] = new Gui2Caption(windowManager, "tv_g2", 32, 1.0f, 3.5f, 3.2f, "0");
+  Gui2Caption *dash = new Gui2Caption(windowManager, "tv_dash", 30.8f, 1.0f, 1.0f, 3.1f, "-");
+  Gui2Caption *live = new Gui2Caption(windowManager, "tv_live", 53, 1.55f, 7, 2.0f, "EN VIVO");
 
-  Gui2Image *bg = new Gui2Image(windowManager, "image_scoreboard_bg", 0, 0, xOffset[8] + 1, height_percent);
-  std::string scoreboardImage = GetConfiguration()->Get("scoreboard_background", "media/menu/scoreboard_bg.png");
-  if (!boost::filesystem::exists(scoreboardImage)) scoreboardImage = "media/menu/scoreboard_bg.png";
-  bg->LoadImage(scoreboardImage);
-  this->AddView(bg);
-  bg->Show();
+  Gui2Caption *texts[] = {timeCaption, teamNameCaption[0], teamNameCaption[1],
+                          goalCountCaption[0], goalCountCaption[1], dash, live};
+  for (int i = 0; i < 7; ++i) {
+    texts[i]->SetColor(i >= 3 && i <= 5 ? Vector3(11, 36, 48) : Vector3(243, 250, 254));
+    texts[i]->SetOutlineColor(Vector3(0, 0, 0));
+    this->AddView(texts[i]);
+    texts[i]->Show();
+  }
 
-  leagueLogo = new Gui2Image(windowManager, "game_scoreboard_leaguelogo", xOffset[0], 0, height_percent / windowManager->GetAspectRatio(), height_percent);
-  this->AddView(leagueLogo);
-  leagueLogo->LoadImage("media/menu/league.png"); // todo: actual league picca
-  leagueLogo->Show();
-
-  timeCaption = new Gui2Caption(windowManager, "game_scoreboard_timecaption", xOffset[1] + content_xOffset, 0, 5, height_percent * 0.9f, "0:00");
-  teamNameCaption[0] = new Gui2Caption(windowManager, "game_scoreboard_team1name", xOffset[3] + content_xOffset, 0, 5, height_percent * 0.9f, match->GetTeam(0)->GetTeamData()->GetShortName());
-  teamNameCaption[1] = new Gui2Caption(windowManager, "game_scoreboard_team2name", xOffset[6] + content_xOffset, 0, 5, height_percent * 0.9f, match->GetTeam(1)->GetTeamData()->GetShortName());
-  goalCountCaption[0] = new Gui2Caption(windowManager, "game_scoreboard_team1goals", xOffset[4] + content_xOffset, 0, 5, height_percent * 0.9f, "0");
-  goalCountCaption[1] = new Gui2Caption(windowManager, "game_scoreboard_team2goals", xOffset[7] + content_xOffset, 0, 5, height_percent * 0.9f, "0");
-
-  timeCaption->SetColor(textColor);
-  timeCaption->SetOutlineColor(textOutlineColor);
-  teamNameCaption[0]->SetColor(textColor);
-  teamNameCaption[0]->SetOutlineColor(textOutlineColor);
-  teamNameCaption[1]->SetColor(textColor);
-  teamNameCaption[1]->SetOutlineColor(textOutlineColor);
-  goalCountCaption[0]->SetColor(textColor);
-  goalCountCaption[0]->SetOutlineColor(textOutlineColor);
-  goalCountCaption[1]->SetColor(textColor);
-  goalCountCaption[1]->SetOutlineColor(textOutlineColor);
-
-  tvLogo = new Gui2Image(windowManager, "game_scoreboard_tvlogo", width_percent - (height_percent * 2.0f) / windowManager->GetAspectRatio(), 0, (height_percent * 2.0f) / windowManager->GetAspectRatio(), height_percent);
-  this->AddView(tvLogo);
-  tvLogo->LoadImage("media/menu/tvlogo.png");
-  tvLogo->Show();
-
-  this->AddView(timeCaption);
-  timeCaption->Show();
-  this->AddView(teamNameCaption[0]);
-  teamNameCaption[0]->Show();
-  this->AddView(teamNameCaption[1]);
-  teamNameCaption[1]->Show();
-  this->AddView(goalCountCaption[0]);
-  goalCountCaption[0]->Show();
-  this->AddView(goalCountCaption[1]);
-  goalCountCaption[1]->Show();
-
+  teamLogo[0] = new Gui2Image(windowManager, "tv_t1_logo", 10.0f, 1.1f, 2.9f, 3.25f);
+  teamLogo[1] = new Gui2Image(windowManager, "tv_t2_logo", 49.0f, 1.1f, 2.9f, 3.25f);
+  for (int i = 0; i < 2; ++i) {
+    teamLogo[i]->LoadImage(match->GetTeam(i)->GetTeamData()->GetLogoUrl());
+    this->AddView(teamLogo[i]);
+    teamLogo[i]->Show();
+  }
   SetGoalCount(0, 0);
   SetGoalCount(1, 0);
-
-  teamLogo[0] = new Gui2Image(windowManager, "game_scoreboard_team1logo", xOffset[2], 0, height_percent / windowManager->GetAspectRatio(), height_percent);
-  this->AddView(teamLogo[0]);
-  teamLogo[0]->LoadImage(match->GetTeam(0)->GetTeamData()->GetLogoUrl());
-  teamLogo[0]->Show();
-
-  teamLogo[1] = new Gui2Image(windowManager, "game_scoreboard_team2logo", xOffset[5], 0, height_percent / windowManager->GetAspectRatio(), height_percent);
-  this->AddView(teamLogo[1]);
-  teamLogo[1]->LoadImage(match->GetTeam(1)->GetTeamData()->GetLogoUrl());
-  teamLogo[1]->Show();
-
   this->Show();
 }
 
@@ -145,8 +110,6 @@ void Gui2ScoreBoard::SetTimeStr(const std::string &timeStr) {
 
 void Gui2ScoreBoard::SetGoalCount(int teamID, int goalCount) {
   this->goalCount[teamID] = goalCount;
-  std::string goalStr = "";
-  if (goalCount < 10) goalStr.append(" ");
-  goalStr.append(int_to_str(goalCount));
+  std::string goalStr = int_to_str(goalCount);
   goalCountCaption[teamID]->SetCaption(goalStr);
 }

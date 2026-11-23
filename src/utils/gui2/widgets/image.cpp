@@ -20,6 +20,7 @@
 #include "../windowmanager.hpp"
 
 #include "SDL2/SDL2_rotozoom.h"
+#include <cstdio>
 
 namespace blunted {
 
@@ -38,6 +39,11 @@ Gui2Image::Gui2Image(Gui2WindowManager *windowManager, const std::string &name,
 
   void Gui2Image::LoadImage(const std::string &filename) {
     SDL_Surface *imageSurfTmp = IMG_Load(filename.c_str());
+    if (!imageSurfTmp) {
+      fprintf(stderr, "[GameplayFootball] Imagen no encontrada: %s (%s)\n",
+              filename.c_str(), IMG_GetError());
+      return; // Keep blank image safely instead of dereferencing nullptr.
+    }
     imageSource = windowManager->CreateImage2D(name + "source", imageSurfTmp->w, imageSurfTmp->h, false);
 
     boost::intrusive_ptr < Resource<Surface> > surfaceRes = imageSource->GetImage();

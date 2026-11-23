@@ -734,10 +734,10 @@ void Match::UpdateIngameCamera() {
   zoom = cameraUserZoom;
   height = cameraUserHeight * 1.5f;
 
-  float playerBias = 0.6f;//0.7f;
+  float playerBias = clamp(GetConfiguration()->GetReal("camera_player_bias", 0.38f), 0.0f, 0.85f);
   Vector3 ballPos = ball->Predict(0) * (1.0f - playerBias) + GetDesignatedPossessionPlayer()->GetPosition() * playerBias;
   // look in possession player's direction
-  ballPos += GetDesignatedPossessionPlayer()->GetDirectionVec() * 1.0f;
+  ballPos += GetDesignatedPossessionPlayer()->GetDirectionVec() * 0.55f;
   // look in possession team's attacking direction
   ballPos += Vector3(((teams[0]->GetFadingTeamPossessionAmount() - 1.0f) * -teams[0]->GetSide() + (teams[1]->GetFadingTeamPossessionAmount() - 1.0f) * -teams[1]->GetSide()) * 4.0f, 0, 0);
 
@@ -749,7 +749,7 @@ void Match::UpdateIngameCamera() {
   if (fabs(ballPos.coords[1]) > maxH) ballPos.coords[1] = maxH * signSide(ballPos.coords[1]);
 
   Vector3 shudder = Vector3(random(-0.1f, 0.1f), random(-0.1f, 0.1f), 0) * (ball->GetMovement().GetLength() * 0.8f + 6.0f);
-  shudder *= 0.2f;
+  shudder *= clamp(GetConfiguration()->GetReal("camera_shake", 0.02f), 0.0f, 0.3f);
   camPos.push_back(ballPos + shudder * ((float)camPos.size() / (float)camPosSize));
   if (camPos.size() > camPosSize) camPos.pop_front();
 
@@ -773,7 +773,7 @@ void Match::UpdateIngameCamera() {
 
   // normal cam
 
-  int camMethod = 1; // 1 == wide, 2 == birds-eye, 3 == tele
+  int camMethod = std::max(1, std::min(3, GetConfiguration()->GetInt("camera_mode", 1))); // 1 TV, 2 aerea, 3 tele
 
   if (!IsGoalScored() || (IsGoalScored() && goalScoredTimer < 1000)) {
 
