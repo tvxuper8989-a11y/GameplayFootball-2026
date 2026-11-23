@@ -26,3 +26,26 @@ jobs:
               assert {'teams', 'players', 'leagues'}.issubset(names)
           print('Datos originales presentes')
           PY
+  compilar-linux:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar dependencias de C++ y SDL2
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential libgl1-mesa-dev \
+            libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-gfx-dev \
+            libopenal-dev libboost-all-dev libsqlite3-dev
+      - name: Configurar CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Compilar
+        run: cmake --build build --parallel 2
+      - name: Preparar recursos
+        run: cp -a data/. build/
+      - name: Publicar resultado Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: gameplayfootball-2026-linux
+          path: build/
+          retention-days: 7

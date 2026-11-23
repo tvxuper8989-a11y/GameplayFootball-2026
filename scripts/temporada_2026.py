@@ -14,10 +14,10 @@ from pathlib import Path
 FIELDS = {
     "teams": {"name", "shortname", "league_id", "logo_url", "kit_url", "color1", "color2"},
     "players": {"firstname", "lastname", "role", "base_stat", "age", "skincolor",
-                "hairstyle", "haircolor", "height"},
+                "hairstyle", "haircolor", "height", "weight", "team_id", "nationalteam_id", "formationorder", "nationalteamformationorder"},
 }
-INTEGER = {"league_id", "age", "skincolor"}
-DECIMAL = {"base_stat", "height"}
+INTEGER = {"league_id", "age", "skincolor", "team_id", "nationalteam_id", "formationorder", "nationalteamformationorder"}
+DECIMAL = {"base_stat", "height", "weight"}
 CONFIG = '''"context_x" "1280"
 "context_y" "720"
 "context_fullscreen" "false"
@@ -59,12 +59,29 @@ def rows_from_csv(db, table, path):
                     continue
                 value = row[col].strip()
                 if col in INTEGER:
-                    value = int(value)
+                    try:
+                        value = int(value)
+                    except ValueError as exc:
+                        raise ValueError(f"{path}:{line}: valor entero invalido {col}") from exc
                     if value < 0 or (col == "age" and not 14 <= value <= 60):
                         raise ValueError(f"{path}:{line}: valor entero invalido {col}")
+                    if col in {"team_id", "nationalteam_id", "league_id"} and value != 0:
+                        reference = "leagues" if col == "league_id" else "teams"
+                        if not db.execute(f'SELECT 1 FROM "{reference}" WHERE id=?', (value,)).fetchone():
+                            raise ValueError(f"{path}:{line}: {col}={value} no existe")
+                    if col in {"team_id", "league_id"} and value == 0:
+                        raise ValueError(f"{path}:{line}: {col} debe ser mayor a cero")
+                    if col in {"formationorder", "nationalteamformationorder"} and value > 99:
+                        raise ValueError(f"{path}:{line}: orden de formacion invalido")
                 elif col in DECIMAL:
-                    value = float(value)
-                    if not math.isfinite(value) or (col == "base_stat" and not 0 <= value <= 1) or (col == "height" and not 1 <= value <= 2.5):
+                    try:
+                        value = float(value)
+                    except ValueError as exc:
+                        raise ValueError(f"{path}:{line}: valor decimal invalido {col}") from exc
+                    if (not math.isfinite(value)
+                            or (col == "base_stat" and not 0 <= value <= 1)
+                            or (col == "height" and not 1 <= value <= 2.5)
+                            or (col == "weight" and not 30 <= value <= 200)):
                         raise ValueError(f"{path}:{line}: valor decimal invalido {col}")
                 values[col] = value
             if values:

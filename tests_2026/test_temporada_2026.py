@@ -17,11 +17,12 @@ class TestTemporada(unittest.TestCase):
         self.src = folder / "database.sqlite"
         with sqlite3.connect(self.src) as db:
             db.execute("CREATE TABLE leagues(id INTEGER PRIMARY KEY, name TEXT)")
-            db.execute("CREATE TABLE teams(id INTEGER PRIMARY KEY, name TEXT, shortname TEXT)")
-            db.execute("CREATE TABLE players(id INTEGER PRIMARY KEY, firstname TEXT, base_stat REAL)")
+            db.execute("CREATE TABLE teams(id INTEGER PRIMARY KEY, name TEXT, shortname TEXT, league_id INTEGER)")
+            db.execute("CREATE TABLE players(id INTEGER PRIMARY KEY, firstname TEXT, base_stat REAL, team_id INTEGER, formationorder INTEGER)")
             db.execute("INSERT INTO leagues VALUES(1,'Original')")
-            db.execute("INSERT INTO teams VALUES(1,'Equipo viejo','VIE')")
-            db.execute("INSERT INTO players VALUES(1,'Jugador viejo',0.5)")
+            db.execute("INSERT INTO teams VALUES(1,'Equipo viejo','VIE',1)")
+            db.execute("INSERT INTO teams VALUES(2,'Equipo destino','DES',1)")
+            db.execute("INSERT INTO players VALUES(1,'Jugador viejo',0.5,1,10)")
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -55,6 +56,34 @@ class TestTemporada(unittest.TestCase):
         csv_file = self.root / "players.csv"
         csv_file.write_text("id,base_stat\n1,nan\n", encoding="utf-8")
         with self.assertRaisesRegex(ValueError, "decimal invalido"):
+            prepare(self.root, players=csv_file, apply=True)
+
+
+    def test_transferencia_valida(self):
+        csv_file = self.root / "traspasos.csv"
+        csv_file.write_text("id,team_id,formationorder\n1,2,12\n", encoding="utf-8")
+        prepare(self.root, players=csv_file, apply=True)
+        with sqlite3.connect(self.src) as db:
+            self.assertEqual(db.execute("SELECT team_id FROM players").fetchone()[0], 1)
+        with sqlite3.connect(self.src.with_name("database_2026.sqlite")) as db:
+            self.assertEqual(db.execute("SELECT team_id,formationorder FROM players").fetchone(), (2, 12))
+
+    def test_transferencia_equipo_inexistente(self):
+        csv_file = self.root / "traspasos.csv"
+        csv_file.write_text("id,team_id\n1,999\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "no existe"):
+            prepare(self.root, players=csv_file, apply=True)
+
+    def test_liga_inexistente(self):
+        csv_file = self.root / "equipos.csv"
+        csv_file.write_text("id,league_id\n1,999\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "no existe"):
+            prepare(self.root, teams=csv_file, apply=True)
+
+    def test_entero_invalido(self):
+        csv_file = self.root / "traspasos.csv"
+        csv_file.write_text("id,team_id\n1,x\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "entero invalido"):
             prepare(self.root, players=csv_file, apply=True)
 
 

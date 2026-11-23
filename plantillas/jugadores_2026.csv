@@ -1,1 +1,1 @@
-id,firstname,lastname,role,base_stat,age,skincolor,hairstyle,haircolor,height
+id,firstname,lastname,role,base_stat,age,skincolor,hairstyle,haircolor,height,weight,team_id,nationalteam_id,formationorder,nationalteamformationorder
