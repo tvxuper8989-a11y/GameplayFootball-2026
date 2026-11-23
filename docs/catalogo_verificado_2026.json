@@ -1,0 +1,90 @@
+{
+  "season": "2026/27",
+  "verified_on": "2026-11-23",
+  "warning": "Los graficos del ZIP son conceptos originales, no replicas oficiales de marcas ni equipos.",
+  "balls": [
+    {
+      "real": "PUMA STELLAR NITRO ULTIMATE",
+      "season": "2026/27",
+      "competitions": [
+        "Premier League",
+        "LaLiga",
+        "Serie A"
+      ],
+      "source": "https://www.premierleague.com/en/news/4670742/new-puma-premier-league-ball-revealed-for-202627-season",
+      "file": "puma_stellar_concept.png"
+    },
+    {
+      "real": "Nike Control",
+      "season": "2026/27",
+      "competitions": [
+        "Women's Super League",
+        "Women's Bundesliga"
+      ],
+      "source": "https://www.wslfootball.com/news/the-2026-27-official-match-balls",
+      "file": "nike_control_concept.png"
+    },
+    {
+      "real": "Nike UEFA ball supply",
+      "season": "2027/28+",
+      "competitions": [
+        "UEFA Champions League",
+        "UEFA Europa League",
+        "UEFA Conference League"
+      ],
+      "source": "https://www.uefa.com/news-media/news/02ab-221562cefbb9-01eaea9da2d2-1000--nike-to-become-uefa-men-s-club-competition-official-matc/",
+      "file": null
+    }
+  ],
+  "boots": [
+    {
+      "brand": "Nike",
+      "lines": [
+        "Mercurial Vapor 17",
+        "Mercurial Superfly 11",
+        "Phantom 6",
+        "Tiempo Maestro"
+      ],
+      "source": "https://about.nike.com/es-ES/newsroom/releases/nike-presenta-sus-nuevas-botas-de-futbol-creadas-para-la-velocidad-las-mercurial-vapor-y-las-mercurial-superfly"
+    },
+    {
+      "brand": "adidas",
+      "lines": [
+        "Predator",
+        "F50",
+        "Copa"
+      ],
+      "source": "https://news.adidas.com/purpose/football/adidas-introduces--chaos-vs-control--pack-featuring-new-f50-and-predator-colourways/s/8114b586-1ecb-4405-9829-f5c48e5a251e"
+    },
+    {
+      "brand": "PUMA",
+      "lines": [
+        "Future",
+        "Ultra",
+        "King"
+      ],
+      "source": "https://about.puma.com/en/this-is-puma/our-sports/teamsport"
+    }
+  ],
+  "kits": [
+    {
+      "club": "FC Barcelona",
+      "type": "home",
+      "source": "https://store.fcbarcelona.com/en-us/pages/home-26-27"
+    },
+    {
+      "club": "Real Madrid",
+      "type": "home",
+      "source": "https://www.realmadrid.com/en-US/news/football/first-team/latest-news/asi-es-la-nueva-camiseta-para-la-temporada-2026-27-03-06-2026"
+    }
+  ],
+  "assets": {
+    "balls": "PNG + ASE + object",
+    "boots": "PNG, global",
+    "face": "fallback illustrated portrait only",
+    "hair": "existing mesh + new color textures",
+    "uni": "PNG home/away/third/fourth/GK, conceptual",
+    "stadiums": "original 3D stadium and new graphics",
+    "scoreboards": "PNG background overlays"
+  }
+}
