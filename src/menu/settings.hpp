@@ -204,6 +204,9 @@ class GraphicsPage : public Gui2Page {
 
   protected:
     void SetResolution(int resIndex);
+    void SetFPSLimit(int fps);
+
+    Gui2Caption *fpsStatus;
 
     std::vector<Resolution> resolutions;
 

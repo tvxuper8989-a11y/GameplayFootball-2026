@@ -17,15 +17,15 @@ MatchOptionsPage::MatchOptionsPage(Gui2WindowManager *windowManager, const Gui2P
   bg->LoadImage("media/menu/backgrounds/black.png");
   bg->Show();
 
-  Gui2Caption *header = new Gui2Caption(windowManager, "matchoptions_caption", 30, 15, 40, 3, "Match options");
+  Gui2Caption *header = new Gui2Caption(windowManager, "matchoptions_caption", 30, 15, 40, 3, "OPCIONES DEL PARTIDO");
   this->AddView(header);
   header->Show();
 
   Gui2Grid *grid = new Gui2Grid(windowManager, "matchoptions_grid", 35, 25, 30, 60);
 
-  difficultySlider = new Gui2Slider(windowManager, "matchoptions_slider_difficulty", 0, 0, 29, 6, "difficulty (when HUMAN vs CPU)");
-  matchDurationSlider = new Gui2Slider(windowManager, "matchoptions_slider_matchduration", 0, 0, 29, 6, "match duration (5 minutes .. 25 min.)");
-  Gui2Button *buttonStart = new Gui2Button(windowManager, "matchoptions_button_start", 0, 0, 29, 3, "Start match");
+  difficultySlider = new Gui2Slider(windowManager, "matchoptions_slider_difficulty", 0, 0, 29, 6, "DIFICULTAD (VS CPU)");
+  matchDurationSlider = new Gui2Slider(windowManager, "matchoptions_slider_matchduration", 0, 0, 29, 6, "DURACIÓN DEL PARTIDO");
+  Gui2Button *buttonStart = new Gui2Button(windowManager, "matchoptions_button_start", 0, 0, 29, 3, "COMENZAR PARTIDO");
 
   float difficulty = GetConfiguration()->GetReal("match_difficulty", _default_Difficulty);
   float matchDuration = GetConfiguration()->GetReal("match_duration", _default_MatchDuration);

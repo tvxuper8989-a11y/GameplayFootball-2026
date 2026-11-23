@@ -14,7 +14,7 @@ VisualOptionsPage::VisualOptionsPage(Gui2WindowManager *windowManager, const Gui
   this->AddView(frame);
   frame->Show();
 
-  Gui2Caption *title = new Gui2Caption(windowManager, "caption_visualoptions", 5, 5, 20, 3, "Visual options");
+  Gui2Caption *title = new Gui2Caption(windowManager, "caption_visualoptions", 5, 5, 20, 3, "OPCIONES VISUALES");
   frame->AddView(title);
   title->Show();
 
@@ -25,19 +25,19 @@ VisualOptionsPage::VisualOptionsPage(Gui2WindowManager *windowManager, const Gui
   kitSelectionPulldown[1] = new Gui2Pulldown(windowManager, "pulldown_visualoptions_kitselection_t2", 0, 0, 30, 3);
   Gui2Caption *kitSelectionCaption2 = new Gui2Caption(windowManager, "caption_visualoptions_kitselection_t2", 0, 0, 20, 3, GetGameTask()->GetMatch()->GetTeam(1)->GetTeamData()->GetName() + " kit");
 
-  kitSelectionPulldown[0]->AddEntry("Kit 01", "team1kit01");
-  kitSelectionPulldown[0]->AddEntry("Kit 02", "team1kit02");
-  kitSelectionPulldown[0]->AddEntry("Third 03", "team1kit03");
-  kitSelectionPulldown[0]->AddEntry("Fourth 04", "team1kit04");
-  kitSelectionPulldown[1]->AddEntry("Kit 01", "team2kit01");
-  kitSelectionPulldown[1]->AddEntry("Kit 02", "team2kit02");
-  kitSelectionPulldown[1]->AddEntry("Third 03", "team2kit03");
-  kitSelectionPulldown[1]->AddEntry("Fourth 04", "team2kit04");
+  kitSelectionPulldown[0]->AddEntry("TITULAR 01", "team1kit01");
+  kitSelectionPulldown[0]->AddEntry("SUPLENTE 02", "team1kit02");
+  kitSelectionPulldown[0]->AddEntry("TERCERA 03", "team1kit03");
+  kitSelectionPulldown[0]->AddEntry("CUARTA 04", "team1kit04");
+  kitSelectionPulldown[1]->AddEntry("TITULAR 01", "team2kit01");
+  kitSelectionPulldown[1]->AddEntry("SUPLENTE 02", "team2kit02");
+  kitSelectionPulldown[1]->AddEntry("TERCERA 03", "team2kit03");
+  kitSelectionPulldown[1]->AddEntry("CUARTA 04", "team2kit04");
   kitSelectionPulldown[1]->SetSelected(1);
   kitSelectionPulldown[0]->sig_OnChange.connect(boost::bind(&VisualOptionsPage::OnChangeKit, this, kitSelectionPulldown[0]));
   kitSelectionPulldown[1]->sig_OnChange.connect(boost::bind(&VisualOptionsPage::OnChangeKit, this, kitSelectionPulldown[1]));
 
-  Gui2Button *randomizeSunButton = new Gui2Button(windowManager, "button_visualoptions_randomizesun", 0, 0, 20, 3, "Randomize sun position");
+  Gui2Button *randomizeSunButton = new Gui2Button(windowManager, "button_visualoptions_randomizesun", 0, 0, 20, 3, "CAMBIAR POSICIÓN DEL SOL");
   randomizeSunButton->sig_OnClick.connect(boost::bind(&VisualOptionsPage::OnRandomizeSun, this));
 
   grid->AddView(kitSelectionCaption1, 0, 0);

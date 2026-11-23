@@ -10,14 +10,14 @@ using namespace blunted;
 
 CameraPage::CameraPage(Gui2WindowManager *windowManager, const Gui2PageData &pageData) : Gui2Page(windowManager, pageData) {
 
-  sliderZoom = new Gui2Slider(windowManager, "camzoomslider", 0, 0, 30, 6, "zoom");
-  sliderHeight = new Gui2Slider(windowManager, "camheightslider", 0, 0, 30, 6, "height");
-  sliderFOV = new Gui2Slider(windowManager, "camfovslider", 0, 0, 30, 6, "fov (perspective)");
-  sliderAngleFactor = new Gui2Slider(windowManager, "camangleslider", 0, 0, 30, 6, "horizontal angle");
-  sliderZoom->AddHelperValue(Vector3(80, 80, 250), "default", _default_CameraZoom);
-  sliderHeight->AddHelperValue(Vector3(80, 80, 250), "default", _default_CameraHeight);
-  sliderFOV->AddHelperValue(Vector3(80, 80, 250), "default", _default_CameraFOV);
-  sliderAngleFactor->AddHelperValue(Vector3(80, 80, 250), "default", _default_CameraAngleFactor);
+  sliderZoom = new Gui2Slider(windowManager, "camzoomslider", 0, 0, 30, 6, "ZOOM");
+  sliderHeight = new Gui2Slider(windowManager, "camheightslider", 0, 0, 30, 6, "ALTURA");
+  sliderFOV = new Gui2Slider(windowManager, "camfovslider", 0, 0, 30, 6, "PERSPECTIVA");
+  sliderAngleFactor = new Gui2Slider(windowManager, "camangleslider", 0, 0, 30, 6, "ÁNGULO HORIZONTAL");
+  sliderZoom->AddHelperValue(Vector3(80, 80, 250), "ORIGINAL", _default_CameraZoom);
+  sliderHeight->AddHelperValue(Vector3(80, 80, 250), "ORIGINAL", _default_CameraHeight);
+  sliderFOV->AddHelperValue(Vector3(80, 80, 250), "ORIGINAL", _default_CameraFOV);
+  sliderAngleFactor->AddHelperValue(Vector3(80, 80, 250), "ORIGINAL", _default_CameraAngleFactor);
 
   Gui2Grid *grid = new Gui2Grid(windowManager, "camgrid", 30, 30, 50, 50);
 

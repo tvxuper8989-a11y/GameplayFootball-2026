@@ -14,7 +14,7 @@ using namespace blunted;
 
 void AddCompetitions(Gui2IconSelector *selector) {
   /*
-  selector->AddEntry("1", "National teams", "databases/default/images_competitions/nationalteams.png");
+  selector->AddEntry("1", "SELECCIONES NACIONALES", "databases/default/images_competitions/nationalteams.png");
   selector->AddEntry("2", "Premier league", "databases/default/images_competitions/premierleague.png");
   selector->AddEntry("3", "Eredivisie", "databases/default/images_competitions/eredivisie.png");
   selector->AddEntry("4", "Bundesliga", "databases/default/images_competitions/bundesliga.png");
@@ -74,8 +74,8 @@ TeamSelectPage::TeamSelectPage(Gui2WindowManager *windowManager, const Gui2PageD
   teamEmblemCredits->SetPosition(50 - teamEmblemCredits->GetTextWidthPercent() / 2, 70);
   teamEmblemCredits->Show();
 
-  Gui2Caption *p1 = new Gui2Caption(windowManager, "teamselect_caption_p1", 19, 20, 28, 3, "Player 1");
-  p2 = new Gui2Caption(windowManager, "teamselect_caption_p2", 51, 20, 28, 3, "Player 2");
+  Gui2Caption *p1 = new Gui2Caption(windowManager, "teamselect_caption_p1", 19, 20, 28, 3, "JUGADOR 1");
+  p2 = new Gui2Caption(windowManager, "teamselect_caption_p2", 51, 20, 28, 3, "JUGADOR 2");
   Gui2Grid *grid1 = new Gui2Grid(windowManager, "teamselect_grid_team1", 19, 24, 30, 41);
   grid2 = new Gui2Grid(windowManager, "teamselect_grid_team2", 51, 24, 30, 41);
 
@@ -83,8 +83,8 @@ TeamSelectPage::TeamSelectPage(Gui2WindowManager *windowManager, const Gui2PageD
   competitionSelect2 = new Gui2IconSelector(windowManager, "teamselect_iconselector_competition2", 0, 0, 29, 18, "Competition select");
   teamSelect1 = new Gui2IconSelector(windowManager, "teamselect_iconselector_team1", 0, 0, 29, 18, "Team select");
   teamSelect2 = new Gui2IconSelector(windowManager, "teamselect_iconselector_team2", 0, 0, 29, 18, "Team select");
-  buttonStart1 = new Gui2Button(windowManager, "teamselect_button_start1", 0, 0, 29, 3, "Ready");
-  buttonStart2 = new Gui2Button(windowManager, "teamselect_button_start2", 0, 0, 29, 3, "Ready");
+  buttonStart1 = new Gui2Button(windowManager, "teamselect_button_start1", 0, 0, 29, 3, "LISTO");
+  buttonStart2 = new Gui2Button(windowManager, "teamselect_button_start2", 0, 0, 29, 3, "LISTO");
 
   competitionSelect1->sig_OnClick.connect(boost::bind(&TeamSelectPage::FocusTeamSelect1, this));
   teamSelect1->sig_OnClick.connect(boost::bind(&TeamSelectPage::FocusStart1, this));
