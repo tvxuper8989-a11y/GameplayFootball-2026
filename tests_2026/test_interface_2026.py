@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def read_config(name):
     text = (ROOT / "data" / name).read_text(encoding="utf-8")
-    return dict(re.findall(r'^"([^"]+)"\\s+"([^"]+)"$', text, re.M))
+    return dict(re.findall(r'^"([^"]+)"\s+"([^"]+)"$', text, re.M))
 
 
 class Interface2026RegressionTests(unittest.TestCase):
