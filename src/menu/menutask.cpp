@@ -147,11 +147,8 @@ void MenuTask::ProcessPhase() {
 
     Properties properties;
     if (!QuickStart()) {
-      if (!IsReleaseVersion()) {
-        windowManager->GetPageFactory()->CreatePage((int)e_PageID_MainMenu, properties, 0);
-      } else {
-        windowManager->GetPageFactory()->CreatePage((int)e_PageID_Intro, properties, 0);
-      }
+      // Launch the 2026/27 HOME directly; the legacy intro is no longer the entry page.
+      windowManager->GetPageFactory()->CreatePage((int)e_PageID_MainMenu, properties, 0);
     } else {
       windowManager->GetPageFactory()->CreatePage((int)e_PageID_LoadingMatch, properties, 0);
     }

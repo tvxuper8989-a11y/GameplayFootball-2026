@@ -30,6 +30,7 @@
 #include <SDL2/SDL.h>
 
 #include "base/log.hpp"
+#include "main.hpp"
 #include "managers/environmentmanager.hpp"
 #include "managers/usereventmanager.hpp"
 #include "types/command.hpp"
@@ -564,6 +565,7 @@ struct GLfunctions {
 
     int gBufWidth = view.width;
     int gBufHeight = view.height;
+    const bool lowMemoryGBuffer = GetConfiguration()->GetBool("graphics_low_memory", false);
 
     view.gBufferID = CreateFrameBuffer();
     BindFrameBuffer(view.gBufferID);
@@ -573,7 +575,7 @@ struct GLfunctions {
     SetFrameBufferTexture2D(e_TargetAttachment_Depth, view.gBuffer_DepthTexID);
 
     //view.gBuffer_AlbedoTexID = CreateTexture(e_InternalPixelFormat_RGBA8, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
-    view.gBuffer_AlbedoTexID = CreateTexture(e_InternalPixelFormat_RGBA16F, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
+    view.gBuffer_AlbedoTexID = CreateTexture(lowMemoryGBuffer ? e_InternalPixelFormat_RGBA8 : e_InternalPixelFormat_RGBA16F, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
     //view.gBuffer_AlbedoTexID = CreateTexture(e_InternalPixelFormat_RGBA32F, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
     SetFrameBufferTexture2D(e_TargetAttachment_Color0, view.gBuffer_AlbedoTexID);
 
@@ -583,7 +585,7 @@ struct GLfunctions {
     SetFrameBufferTexture2D(e_TargetAttachment_Color1, view.gBuffer_NormalTexID);
 
     //view.gBuffer_AuxTexID = CreateTexture(e_InternalPixelFormat_RGBA8, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
-    view.gBuffer_AuxTexID = CreateTexture(e_InternalPixelFormat_RGBA16F, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
+    view.gBuffer_AuxTexID = CreateTexture(lowMemoryGBuffer ? e_InternalPixelFormat_RGBA8 : e_InternalPixelFormat_RGBA16F, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
     //view.gBuffer_AuxTexID = CreateTexture(e_InternalPixelFormat_RGBA32F, e_PixelFormat_RGBA, gBufWidth, gBufHeight, false, false, false, false, false);
     SetFrameBufferTexture2D(e_TargetAttachment_Color2, view.gBuffer_AuxTexID);
 
@@ -2040,6 +2042,9 @@ struct GLfunctions {
       SetUniformInt("ambient", "map_depth", 2); // recently swapped with aux
       SetUniformInt("ambient", "map_aux", 3);
       SetUniformInt("ambient", "map_noise", 4);
+      const int ssaoSamples = std::max(4, std::min(32,
+          GetConfiguration()->GetInt("graphics_ssao_samples", 32)));
+      SetUniformInt("ambient", "ssao_sample_count", ssaoSamples);
 
       SetUniformFloat("ambient", "contextX", (float)0.0);
       SetUniformFloat("ambient", "contextY", (float)0.0);

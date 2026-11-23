@@ -115,6 +115,13 @@ void MenuScene::Process() {
     targetLocation.position += offset;
   }
 
+  // A static HOME camera avoids needless animation work on low-end Intel GPUs.
+  if (!GetConfiguration()->GetBool("menu_ambient_animation", true)) {
+    camera->SetPosition(currentPosition);
+    camera->SetRotation(currentOrientation);
+    return;
+  }
+
   // move around a little
   float randomPositionIntensity = 0.3f;
   Vector3 randomPositionNoise;

@@ -14,6 +14,7 @@
 #include "blunted.hpp"
 
 #include <set>
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 
 using namespace blunted;
@@ -81,62 +82,81 @@ void OutroPage::ProcessWindowingEvent(WindowingEvent *event) {
 }
 
 void OutroPage::ProcessKeyboardEvent(KeyboardEvent *event) {
-  GetMenuTask()->QuitGame();
+  GetMenuTas// Lightweight, procedural HOME screen: no additional image files or large textures.
+// This remains fully keyboard-navigable with the existing Gui2Grid.
+static void AddHomePanel(Gui2WindowManager *wm, Gui2Page *page,
+                         const std::string &name, float x, float y, float w, float h,
+                         const Vector3 &color, int opacity) {
+  Gui2Image *panel = new Gui2Image(wm, name, x, y, w, h);
+  std::vector<boost::intrusive_ptr<Image2D> > images;
+  panel->GetImages(images);
+  int px, py, pw, ph;
+  wm->GetCoordinates(x, y, w, h, px, py, pw, ph);
+  images.at(0)->DrawRectangle(0, 0, pw, ph, color, opacity);
+  images.at(0)->OnChange();
+  page->AddView(panel);
+  panel->Show();
 }
 
+static void AddHomeText(Gui2WindowManager *wm, Gui2Page *page,
+                        const std::string &name, const std::string &caption,
+                        float x, float y, float w, float h, const Vector3 &color) {
+  Gui2Caption *text = new Gui2Caption(wm, name, x, y, w, h, caption);
+  text->SetColor(color);
+  page->AddView(text);
+  text->Show();
+}
 
 MainMenuPage::MainMenuPage(Gui2WindowManager *windowManager, const Gui2PageData &pageData) : Gui2Page(windowManager, pageData) {
-  Gui2Image *title = new Gui2Image(windowManager, "image_main_title", 28, 32, 44, 20);
-  title->LoadImage("media/menu/main/title01.png");
+  // New 2026/27 landing screen replaces the 2015 title + disabled grid.
+  // All graphic elements are drawn once, not rebuilt every frame.
+  AddHomePanel(windowManager, this, "home_background", 0, 0, 100, 100, Vector3(6, 15, 27), 249);
+  AddHomePanel(windowManager, this, "home_navigation_area", 0, 0, 44, 100, Vector3(11, 27, 43), 245);
+  AddHomePanel(windowManager, this, "home_accent_top", 0, 0, 100, 1.0f, Vector3(57, 199, 226), 255);
+  AddHomePanel(windowManager, this, "home_accent_left", 7.5f, 11, 0.6f, 18, Vector3(57, 199, 226), 255);
+  AddHomePanel(windowManager, this, "home_hero_line", 55, 70, 34, 0.5f, Vector3(57, 199, 226), 230);
 
-  this->AddView(title);
-  title->Show();
+  AddHomeText(windowManager, this, "home_brand", "GAMEPLAY FOOTBALL", 10, 10, 32, 6.8f, Vector3(245, 250, 255));
+  AddHomeText(windowManager, this, "home_season", "EDICION 2026 / 2027", 10, 20, 31, 3.2f, Vector3(57, 199, 226));
+  AddHomeText(windowManager, this, "home_nav_label", "MENU PRINCIPAL", 10, 31, 30, 2.5f, Vector3(165, 190, 208));
+  AddHomeText(windowManager, this, "home_big_26", "26", 63, 18, 28, 29, Vector3(244, 250, 255));
+  AddHomeText(windowManager, this, "home_big_tag", "NUEVA TEMPORADA", 55, 54, 39, 5.0f, Vector3(57, 199, 226));
+  AddHomeText(windowManager, this, "home_hero_copy", "EL PARTIDO COMIENZA ACA", 55, 62, 40, 3.2f, Vector3(223, 236, 247));
+  AddHomeText(windowManager, this, "home_hero_note", "FLECHAS PARA NAVEGAR   ENTER O ESPACIO PARA ELEGIR", 55, 75, 41, 2.2f, Vector3(157, 183, 202));
+  AddHomeText(windowManager, this, "home_footer", "GAMEPLAY FOOTBALL 2026 / 27  -  EDICION LINUX", 10, 93, 78, 2.1f, Vector3(133, 161, 184));
 
-  buttons.push_back(new Gui2Button(windowManager, "button_main_start", 0, 0, 20, 3, "Match"));
-  buttons.push_back(new Gui2Button(windowManager, "button_main_cup", 0, 0, 20, 3, "Cup"));
-  buttons.push_back(new Gui2Button(windowManager, "button_main_league", 0, 0, 20, 3, "League"));
-  buttons.push_back(new Gui2Button(windowManager, "button_main_edit", 0, 0, 20, 3, "Editor"));
-  buttons.push_back(new Gui2Button(windowManager, "button_main_settings", 0, 0, 20, 3, "Settings"));
-  buttons.push_back(new Gui2Button(windowManager, "button_main_credits", 0, 0, 20, 3, "Credits"));
-  buttons.push_back(new Gui2Button(windowManager, "button_main_quit", 0, 0, 20, 3, "Exit"));
+  buttons.push_back(new Gui2Button(windowManager, "home_match", 0, 0, 29, 7, "JUGAR PARTIDO"));
+  buttons.push_back(new Gui2Button(windowManager, "home_settings", 0, 0, 29, 7, "CONFIGURACION"));
+  buttons.push_back(new Gui2Button(windowManager, "home_credits", 0, 0, 29, 7, "CREDITOS"));
+  buttons.push_back(new Gui2Button(windowManager, "home_exit", 0, 0, 29, 7, "SALIR"));
   if (!IsReleaseVersion()) {
-    buttons.push_back(new Gui2Button(windowManager, "button_main_import", 0, 0, 20, 3, "Import FM"));
+    buttons.push_back(new Gui2Button(windowManager, "home_import", 0, 0, 29, 7, "IMPORT FM"));
   }
-
   buttons.at(0)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoControllerSelect, this));
-  buttons.at(2)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoLeague, this));
-  buttons.at(4)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoSettings, this));
-  buttons.at(5)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoCredits, this));
+  buttons.at(1)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoSettings, this));
+  buttons.at(2)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoCredits, this));
   if (!IsReleaseVersion()) {
-    buttons.at(6)->sig_OnClick.connect(boost::bind(&MenuTask::QuitGame, GetMenuTask()));
+    buttons.at(3)->sig_OnClick.connect(boost::bind(&MenuTask::QuitGame, GetMenuTask()));
+    buttons.at(4)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoImportDB, this));
   } else {
-    buttons.at(6)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoOutro, this));
-  }
-  if (!IsReleaseVersion()) {
-    buttons.at(7)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoImportDB, this));
+    buttons.at(3)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoOutro, this));
   }
 
-  buttons.at(1)->SetActive(false);
-  buttons.at(2)->SetActive(false);
-  buttons.at(3)->SetActive(false);
-
-  grid = new Gui2Grid(windowManager, "grid_main", 29.25, 52, 41.5, 40);
-
-  grid->AddView(buttons.at(0), 0, 0);
-  grid->AddView(buttons.at(1), 1, 0);
-  grid->AddView(buttons.at(2), 2, 0);
-  grid->AddView(buttons.at(3), 3, 0);
-  grid->AddView(buttons.at(4), 0, 1);
-  grid->AddView(buttons.at(5), 1, 1);
-  grid->AddView(buttons.at(6), 2, 1);
-  if (!IsReleaseVersion()) grid->AddView(buttons.at(7), 3, 1);
-
-  grid->UpdateLayout(0.25, 0.25, 0.25, 0.25);
-
+  grid = new Gui2Grid(windowManager, "home_navigation", 10, 40, 33, 47);
+  for (unsigned int i = 0; i < buttons.size(); ++i) {
+    buttons.at(i)->SetColor(Vector3(205, 227, 238));
+    grid->AddView(buttons.at(i), static_cast<int>(i), 0);
+  }
+  grid->UpdateLayout(0.6f, 0.6f, 1.2f, 1.2f);
   this->AddView(grid);
   grid->Show();
 
-  buttons.at(pageData.properties->GetInt("selectedButtonID"))->SetFocus();
+  const int index = std::max(0, std::min(static_cast<int>(buttons.size()) - 1,
+                                         pageData.properties->GetInt("selectedButtonID", 0)));
+  buttons.at(index)->SetFocus();
+  this->Show();
+}
+;
 
   this->Show();
 }
@@ -171,7 +191,7 @@ void MainMenuPage::GoSettings() {
 
   this->Exit();
 
-  pageData.properties->Set("selectedButtonID", 4);
+  pageData.properties->Set("selectedButtonID", 1);
   Properties properties;
   windowManager->GetPageFactory()->CreatePage((int)e_PageID_Settings, properties, 0);
 
@@ -181,7 +201,7 @@ void MainMenuPage::GoSettings() {
 void MainMenuPage::GoCredits() {
   this->Exit();
 
-  pageData.properties->Set("selectedButtonID", 5);
+  pageData.properties->Set("selectedButtonID", 2);
   Properties properties;
   windowManager->GetPageFactory()->CreatePage((int)e_PageID_Credits, properties, 0);
 

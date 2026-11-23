@@ -5,6 +5,7 @@
 #include "graphics_task.hpp"
 
 #include "base/log.hpp"
+#include "main.hpp"
 #include "base/utils.hpp"
 
 #include "managers/taskmanager.hpp"
@@ -193,8 +194,11 @@ namespace blunted {
     }
 
 
-    shadowSkipFrameCounter++;
-    if (shadowSkipFrameCounter > 1) shadowSkipFrameCounter = 0;
+    // Fewer shadow-map updates reduce CPU/GPU work on integrated graphics.
+    // Default remains two frames; the Lenovo profile uses four.
+    const int interval = std::max(1, std::min(8,
+        GetConfiguration()->GetInt("graphics_shadow_update_frames", 2)));
+    shadowSkipFrameCounter = (shadowSkipFrameCounter + 1) % interval;
   }
 
 

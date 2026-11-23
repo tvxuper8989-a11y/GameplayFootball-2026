@@ -52,7 +52,12 @@ Player *PlayerController::CastPlayer() { return static_cast<Player*>(player); }
 
 int PlayerController::GetReactionTime_ms() {
   int reactionTime_ms = IController::GetReactionTime_ms();
-  if (team->GetHumanGamerCount() == 0) reactionTime_ms += (1.0f - GetMatch()->GetMatchDifficulty()) * 100;
+  if (team->GetHumanGamerCount() == 0) {
+    reactionTime_ms += (1.0f - GetMatch()->GetMatchDifficulty()) * 100;
+    // Configurable anticipation bonus for CPU players; preserve their skill differences.
+    const int bonus_ms = clamp(GetConfiguration()->GetInt("ai_reaction_bonus_ms", 0), 0, 30);
+    reactionTime_ms = std::max(20, reactionTime_ms - bonus_ms);
+  }
   return reactionTime_ms;
 }
 

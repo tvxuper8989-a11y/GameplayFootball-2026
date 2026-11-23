@@ -76,7 +76,7 @@ void HumanController::RequestCommand(PlayerCommandQueue &commandQueue) {
 
   // cancel action buffer
   if (actionMode == 2 && !match->IsInSetPiece() &&
-      (actionBufferTime_ms > 2000 ||
+      (actionBufferTime_ms > clamp(GetConfiguration()->GetInt("human_action_buffer_ms", 2000), 400, 2000) ||
        CastPlayer()->GetTimeNeededToGetToBall_ms() > CastPlayer()->GetTimeNeededToGetToBall_previous_ms() + 700 ||
       (CastPlayer()->GetCurrentFunctionType() == e_FunctionType_Interfere))) {
     actionMode = 0;
@@ -97,7 +97,7 @@ void HumanController::RequestCommand(PlayerCommandQueue &commandQueue) {
   if (actionMode == 2) {
 
     if (!hid->GetButton(actionButton) ||
-        (hid->GetButton(actionButton) && gauge_ms > 500) || // allow anim to kick in before queue is complete (before button is released), it will usually touch ball after the remaining time anyway, so we still have time to add more power, yet still respond as fast as possible
+        (hid->GetButton(actionButton) && gauge_ms > clamp(GetConfiguration()->GetInt("human_action_windup_ms", 500), 200, 600)) || // allow anim to kick in before queue is complete (before button is released), it will usually touch ball after the remaining time anyway, so we still have time to add more power, yet still respond as fast as possible
         (!CastPlayer()->HasPossession() && !match->IsInSetPiece() && actionBufferTime_ms > 0)) {
 
       int baseTime_ms = 60; // substract a little because we can't really press a button shorter than this
@@ -486,7 +486,7 @@ void HumanController::Reset() {
   actionBufferTime_ms = 0;
 
   lastSwitchTime_ms = -10000;
-  lastSwitchTimeDuration_ms = 300;
+  lastSwitchTimeDuration_ms = clamp(GetConfiguration()->GetInt("human_switch_blend_ms", 300), 100, 500);
 
   lastSteadyDirectionSnapshotTime_ms = 0;
   steadyDirection = Vector3(0, -1, 0);
@@ -511,7 +511,7 @@ void HumanController::_GetHidInput(Vector3 &rawInputDirection, float &rawInputVe
   }
 
   if (GetLastSwitchBias() > 0.0f) {
-    float switchInfluence = 0.5f;
+    float switchInfluence = clamp(GetConfiguration()->GetReal("human_switch_influence", 0.5f), 0.0f, 0.8f);
     float switchBias = pow(GetLastSwitchBias(), 0.7f);
     Vector3 currentMovement = player->GetDirectionVec() * player->GetFloatVelocity();
     Vector3 manualMovement = rawInputDirection * rawInputVelocityFloat;

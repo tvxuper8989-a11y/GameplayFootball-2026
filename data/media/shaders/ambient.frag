@@ -25,6 +25,7 @@ uniform vec2 cameraClip;
 const int SSAO_kernelSize = 32; // don't make larger than this: 32 is hardcoded in source, so no more sample positions exist
 //uniform int SSAO_kernelSize; // won't work until glsl 4.3 or so.
 uniform vec3 SSAO_kernel[SSAO_kernelSize];
+uniform int ssao_sample_count; // 4..32, selected by the graphics profile
 
 out vec4 stdout0;
 out vec4 stdout1;
@@ -148,7 +149,7 @@ void main(void) {
   vec3 bitangent = cross(viewNormal, tangent);
   mat3 tbn = mat3(tangent, bitangent, viewNormal);
 
-  for (int i = 0; i < SSAO_kernelSize; ++i) {
+  for (int i = 0; i < ssao_sample_count; ++i) {
 
     // get sample position in viewspace coords
     vec3 sample = tbn * SSAO_kernel[i];
@@ -173,7 +174,7 @@ void main(void) {
 
     SSAO += rangeCheckFalloff * rangeCheckInside;
   }
-  SSAO /= SSAO_kernelSize * 1.0f;
+  SSAO /= float(max(ssao_sample_count, 1));
   SSAO = 1.0f - SSAO;
   //SSAO = SSAO * 2.0f - 1.0f; // exaggerate effect
   SSAO = SSAO * 1.5f - 0.5f; // exaggerate effect
