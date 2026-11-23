@@ -22,10 +22,17 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Localizar SDK Android de GitHub Actions
+        run: |
+          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> "$GITHUB_ENV"
+          test -d /usr/local/lib/android/sdk
       - name: Instalar plataforma y herramientas
-        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+        run: |
+          SDKMGR=$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)
+          test -n "$SDKMGR"
+          yes | "$SDKMGR" --licenses >/dev/null || true
+          "$SDKMGR" "platforms;android-35" "build-tools;35.0.0"
       - name: Compilar APK instalable de depuración
         run: gradle -p android :app:assembleDebug --no-daemon --stacktrace
       - name: Validar que se haya generado APK
