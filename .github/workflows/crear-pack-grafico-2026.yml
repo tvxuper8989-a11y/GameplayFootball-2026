@@ -1,0 +1,47 @@
+name: Crear pack grafico 2026-27
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths:
+      - scripts/generar_graficos_2026.py
+      - .github/workflows/crear-pack-grafico-2026.yml
+jobs:
+  pack:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar dependencia grafica
+        run: python -m pip install pillow==11.3.0
+      - name: Generar archivos PNG y modelos de pelota ASE
+        run: python scripts/generar_graficos_2026.py --source data --output build_assets_2026_27
+      - name: Verificar compatibilidad basica
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+          root = Path("build_assets_2026_27")
+          data = json.loads((root / "CATALOGO_GENERADO.json").read_text())
+          assert data["clubs"] >= 8, data["clubs"]
+          assert len(data["files"]) >= 70, len(data["files"])
+          for filename in data["files"]:
+              p = root / filename
+              assert p.is_file(), filename
+              if filename.endswith(".png"):
+                  with Image.open(p) as image:
+                      image.verify()
+          assert (root / "football_graficos_2026_27.config").exists()
+          print("OK, archivos graficos validados:",len(data["files"]))
+          PY
+      - name: Comprimir pack en ZIP
+        run: cd build_assets_2026_27 && zip -q -r "$GITHUB_WORKSPACE/GameplayFootball_2026_27_Graficos.zip" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GameplayFootball-2026-27-Pack-Graficos
+          path: GameplayFootball_2026_27_Graficos.zip
+          retention-days: 30
