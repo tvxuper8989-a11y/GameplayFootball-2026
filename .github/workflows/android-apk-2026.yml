@@ -1,0 +1,38 @@
+name: Compilar APK Android 2026
+on:
+  push:
+    branches: [android-apk-juego-movil-2026, master]
+    paths: ['android/**', '.github/workflows/android-apk-2026.yml']
+  pull_request:
+    branches: [master]
+    paths: ['android/**', '.github/workflows/android-apk-2026.yml']
+  workflow_dispatch:
+jobs:
+  apk-debug:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Instalar Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Instalar plataforma y herramientas
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Compilar APK instalable de depuración
+        run: gradle -p android :app:assembleDebug --no-daemon --stacktrace
+      - name: Validar que se haya generado APK
+        run: test -s android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Publicar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameplayFootball-2026-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
