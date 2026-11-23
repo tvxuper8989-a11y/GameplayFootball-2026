@@ -1,3 +1,11 @@
+# GameplayFootball 2026 — versión del juego
+
+**La edición del juego y las modificaciones para la temporada 2026/27 están en la rama [`master`](https://github.com/tvxuper8989-a11y/GameplayFootball-2026/tree/master).**
+
+Esta rama `google-brain` conserva la versión orientada a investigación y no corresponde al juego original completo. [Ver código del juego y actualizaciones](https://github.com/tvxuper8989-a11y/GameplayFootball-2026/tree/master) · [Ver guía técnica de actualización](https://github.com/tvxuper8989-a11y/GameplayFootball-2026/blob/master/docs/ACTUALIZACION_2026.md).
+
+---
+
 # Gameplay Football
 Football game, discontinued
 
