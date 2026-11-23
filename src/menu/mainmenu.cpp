@@ -110,53 +110,53 @@ static void AddHomeText(Gui2WindowManager *wm, Gui2Page *page,
   text->Show();
 }
 
-MainMenuPage::MainMenuPage(Gui2WindowManager *windowManager, const Gui2PageData &pageData) : Gui2Page(windowManager, pageData) {
-  // New 2026/27 landing screen replaces the 2015 title + disabled grid.
-  // All graphic elements are drawn once, not rebuilt every frame.
-  AddHomePanel(windowManager, this, "home_background", 0, 0, 100, 100, Vector3(6, 15, 27), 249);
-  AddHomePanel(windowManager, this, "home_navigation_area", 0, 0, 44, 100, Vector3(11, 27, 43), 245);
-  AddHomePanel(windowManager, this, "home_accent_top", 0, 0, 100, 1.0f, Vector3(57, 199, 226), 255);
-  AddHomePanel(windowManager, this, "home_accent_left", 7.5f, 11, 0.6f, 18, Vector3(57, 199, 226), 255);
-  AddHomePanel(windowManager, this, "home_hero_line", 55, 70, 34, 0.5f, Vector3(57, 199, 226), 230);
+MainMenuPage::MainMenuPage(Gui2WindowManager *windowManager, const Gui2PageData &pageData)
+    : Gui2Page(windowManager, pageData) {
+  // 16:9 Spanish football HOME using static colored panels, no moving city scenery.
+  AddHomePanel(windowManager, this, "h_base", 0, 0, 100, 100, Vector3(7, 20, 35), 255);
+  AddHomePanel(windowManager, this, "h_left", 0, 0, 44, 100, Vector3(12, 30, 48), 255);
+  AddHomePanel(windowManager, this, "h_top", 0, 0, 100, 0.6f, Vector3(74, 194, 219), 255);
+  AddHomePanel(windowManager, this, "h_divider", 44, 0, 0.2f, 100, Vector3(34, 79, 87), 255);
+  AddHomePanel(windowManager, this, "h_bar", 7, 13, 0.5f, 16, Vector3(97, 214, 181), 255);
+  AddHomePanel(windowManager, this, "h_footer", 7, 87, 86, 0.2f, Vector3(47, 84, 100), 255);
 
-  AddHomeText(windowManager, this, "home_brand", "GAMEPLAY FOOTBALL", 10, 10, 32, 6.8f, Vector3(245, 250, 255));
-  AddHomeText(windowManager, this, "home_season", "EDICION 2026 / 2027", 10, 20, 31, 3.2f, Vector3(57, 199, 226));
-  AddHomeText(windowManager, this, "home_nav_label", "MENU PRINCIPAL", 10, 31, 30, 2.5f, Vector3(165, 190, 208));
-  AddHomeText(windowManager, this, "home_big_26", "26", 63, 18, 28, 29, Vector3(244, 250, 255));
-  AddHomeText(windowManager, this, "home_big_tag", "NUEVA TEMPORADA", 55, 54, 39, 5.0f, Vector3(57, 199, 226));
-  AddHomeText(windowManager, this, "home_hero_copy", "EL PARTIDO COMIENZA ACA", 55, 62, 40, 3.2f, Vector3(223, 236, 247));
-  AddHomeText(windowManager, this, "home_hero_note", "FLECHAS PARA NAVEGAR   ENTER O ESPACIO PARA ELEGIR", 55, 75, 41, 2.2f, Vector3(157, 183, 202));
-  AddHomeText(windowManager, this, "home_footer", "GAMEPLAY FOOTBALL 2026 / 27  -  EDICION LINUX", 10, 93, 78, 2.1f, Vector3(133, 161, 184));
+  AddHomeText(windowManager, this, "h_title", "GAMEPLAY FOOTBALL", 9, 12, 32, 4.6f, Vector3(240, 249, 255));
+  AddHomeText(windowManager, this, "h_season", "TEMPORADA 2026 / 2027", 9, 20, 29, 2.7f, Vector3(98, 212, 221));
+  AddHomeText(windowManager, this, "h_subtitle", "ELEGÍ CÓMO JUGAR", 9, 34, 30, 2.8f, Vector3(166, 194, 207));
+  AddHomeText(windowManager, this, "h_righttitle", "FÚTBOL 2026 / 27", 54, 8, 39, 5, Vector3(228, 240, 248));
+  AddHomeText(windowManager, this, "h_hint", "FLECHAS PARA MOVER   /   ENTER O ESPACIO PARA ELEGIR", 7, 91, 86, 2.3f, Vector3(160, 187, 202));
 
-  buttons.push_back(new Gui2Button(windowManager, "home_match", 0, 0, 29, 7, "JUGAR PARTIDO"));
-  buttons.push_back(new Gui2Button(windowManager, "home_settings", 0, 0, 29, 7, "CONFIGURACION"));
-  buttons.push_back(new Gui2Button(windowManager, "home_credits", 0, 0, 29, 7, "CREDITOS"));
-  buttons.push_back(new Gui2Button(windowManager, "home_exit", 0, 0, 29, 7, "SALIR"));
-  if (!IsReleaseVersion()) {
-    buttons.push_back(new Gui2Button(windowManager, "home_import", 0, 0, 29, 7, "IMPORT FM"));
-  }
+  // Minimal pitch illustration made from lightweight rectangles.
+  AddHomePanel(windowManager, this, "f_t", 54, 22, 40, 0.28f, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_b", 54, 78, 40, 0.28f, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_l", 54, 22, 0.22f, 56, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_r", 94, 22, 0.22f, 56, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_mid", 74, 22, 0.22f, 56, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_ltop", 54, 36, 8, 0.28f, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_lbottom", 54, 64, 8, 0.28f, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_lback", 62, 36, 0.22f, 28, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_rtop", 86, 36, 8, 0.28f, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_rbottom", 86, 64, 8, 0.28f, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_rback", 86, 36, 0.22f, 28, Vector3(55, 115, 115), 255);
+  AddHomePanel(windowManager, this, "f_center", 73.5f, 49, 1, 1.3f, Vector3(132, 214, 197), 255);
+
+  buttons.push_back(new Gui2Button(windowManager, "home_play", 0, 0, 32, 4.6f, "JUGAR PARTIDO"));
+  buttons.push_back(new Gui2Button(windowManager, "home_settings", 0, 0, 32, 4.6f, "CONFIGURACIÓN"));
+  buttons.push_back(new Gui2Button(windowManager, "home_credits", 0, 0, 32, 4.6f, "CRÉDITOS"));
+  buttons.push_back(new Gui2Button(windowManager, "home_exit", 0, 0, 32, 4.6f, "SALIR"));
   buttons.at(0)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoControllerSelect, this));
   buttons.at(1)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoSettings, this));
   buttons.at(2)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoCredits, this));
-  if (!IsReleaseVersion()) {
-    buttons.at(3)->sig_OnClick.connect(boost::bind(&MenuTask::QuitGame, GetMenuTask()));
-    buttons.at(4)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoImportDB, this));
-  } else {
-    buttons.at(3)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoOutro, this));
-  }
+  if (IsReleaseVersion()) buttons.at(3)->sig_OnClick.connect(boost::bind(&MainMenuPage::GoOutro, this));
+  else buttons.at(3)->sig_OnClick.connect(boost::bind(&MenuTask::QuitGame, GetMenuTask()));
 
-  grid = new Gui2Grid(windowManager, "home_navigation", 10, 40, 33, 47);
-  for (unsigned int i = 0; i < buttons.size(); ++i) {
-    buttons.at(i)->SetColor(Vector3(205, 227, 238));
-    grid->AddView(buttons.at(i), static_cast<int>(i), 0);
-  }
-  grid->UpdateLayout(0.6f, 0.6f, 1.2f, 1.2f);
+  grid = new Gui2Grid(windowManager, "home_navigation", 9, 42, 33, 35);
+  for (unsigned int i = 0; i < buttons.size(); ++i) grid->AddView(buttons.at(i), static_cast<int>(i), 0);
+  grid->UpdateLayout(0.6f, 0.6f, 1.1f, 1.1f);
   this->AddView(grid);
   grid->Show();
-
-  const int index = std::max(0, std::min(static_cast<int>(buttons.size()) - 1,
-                                         pageData.properties->GetInt("selectedButtonID", 0)));
-  buttons.at(index)->SetFocus();
+  const int previous = pageData.properties->GetInt("selectedButtonID", 0);
+  buttons.at(std::max(0, std::min(previous, static_cast<int>(buttons.size() - 1))))->SetFocus();
   this->Show();
 }
 
