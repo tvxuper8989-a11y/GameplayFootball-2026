@@ -82,7 +82,10 @@ void OutroPage::ProcessWindowingEvent(WindowingEvent *event) {
 }
 
 void OutroPage::ProcessKeyboardEvent(KeyboardEvent *event) {
-  GetMenuTas// Lightweight, procedural HOME screen: no additional image files or large textures.
+  GetMenuTask()->QuitGame();
+}
+
+// Lightweight, procedural HOME screen: no additional image files or large textures.
 // This remains fully keyboard-navigable with the existing Gui2Grid.
 static void AddHomePanel(Gui2WindowManager *wm, Gui2Page *page,
                          const std::string &name, float x, float y, float w, float h,
@@ -154,10 +157,6 @@ MainMenuPage::MainMenuPage(Gui2WindowManager *windowManager, const Gui2PageData 
   const int index = std::max(0, std::min(static_cast<int>(buttons.size()) - 1,
                                          pageData.properties->GetInt("selectedButtonID", 0)));
   buttons.at(index)->SetFocus();
-  this->Show();
-}
-;
-
   this->Show();
 }
 

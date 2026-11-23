@@ -164,7 +164,8 @@ void MenuTask::ProcessPhase() {
 }
 
 bool MenuTask::QuickStart() {
-  return !IsReleaseVersion() && EnvironmentManager::GetInstance().GetTime_ms() < 10000; // after 5 seconds, quickstart disabled (== after > 0 matches have been played)
+  return GetConfiguration()->GetBool("menu_quick_start", false) && !IsReleaseVersion() &&
+         EnvironmentManager::GetInstance().GetTime_ms() < 10000; // after 5 seconds, quickstart disabled (== after > 0 matches have been played)
 }
 
 void MenuTask::QuitGame() {
