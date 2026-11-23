@@ -93,7 +93,9 @@ namespace blunted {
         event->SetKeyOnce(pressedKey);
 
         if (keyboard) {
-          if (pressedKey == SDLK_RETURN) {
+          // Accept the main Enter key, numeric keypad Enter, and Space in menus.
+          // Some Linux keyboard layouts emit SDLK_KP_ENTER rather than SDLK_RETURN.
+          if (pressedKey == SDLK_RETURN || pressedKey == SDLK_KP_ENTER || pressedKey == SDLK_SPACE) {
             wEvent->SetActivate();
             needsWindowingEvent = true;
           }
