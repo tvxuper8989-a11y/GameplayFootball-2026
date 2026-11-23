@@ -72,11 +72,11 @@ MenuTask::MenuTask(float aspectRatio, float margin, TTF_Font *defaultFont, TTF_F
   // huisstijl:
   // blauw: 0, 100, 220
   // orange: 240, 100, 0
-  style->SetColor(e_DecorationType_Dark1, Vector3(20, 35, 55));
-  style->SetColor(e_DecorationType_Dark2, Vector3(60, 35, 20));
-  style->SetColor(e_DecorationType_Bright1, Vector3(150, 180, 220));
-  style->SetColor(e_DecorationType_Bright2, Vector3(240, 150, 100));
-  style->SetColor(e_DecorationType_Toggled, Vector3(240, 60, 60));
+  style->SetColor(e_DecorationType_Dark1, Vector3(14, 29, 46));
+  style->SetColor(e_DecorationType_Dark2, Vector3(66, 85, 104));
+  style->SetColor(e_DecorationType_Bright1, Vector3(226, 240, 249));
+  style->SetColor(e_DecorationType_Bright2, Vector3(72, 190, 221));
+  style->SetColor(e_DecorationType_Toggled, Vector3(97, 214, 181));
 
   windowManager->SetTimeStep_ms(10);
 
@@ -144,6 +144,8 @@ void MenuTask::ProcessPhase() {
 
     GetGameTask()->Action(e_GameTaskMessage_StopMatch);
     GetGameTask()->Action(e_GameTaskMessage_StartMenuScene);
+    // Hide the legacy city wallpaper behind all menu pages.
+    windowManager->BlackoutBackground(true);
 
     Properties properties;
     if (!QuickStart()) {
@@ -154,6 +156,7 @@ void MenuTask::ProcessPhase() {
     }
 
   } else if (menuAction == e_MenuAction_Game) {
+    windowManager->BlackoutBackground(false);
 
     GetGameTask()->Action(e_GameTaskMessage_StopMenuScene);
     GetGameTask()->Action(e_GameTaskMessage_StartMatch);

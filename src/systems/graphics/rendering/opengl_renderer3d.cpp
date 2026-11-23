@@ -27,6 +27,9 @@
 #endif
 
 #include <cmath>
+#include <chrono>
+#include <thread>
+#include <algorithm>
 #include <SDL2/SDL.h>
 
 #include "base/log.hpp"
@@ -72,6 +75,19 @@ struct GLfunctions {
   };
 
   void OpenGLRenderer3D::SwapBuffers() {
+    // Optional upper frame-rate limit (not guaranteed FPS). Physics stays at 10ms.
+    const int requested = GetConfiguration()->GetInt("graphics_fps_limit", 0);
+    static std::chrono::steady_clock::time_point deadline;
+    if (requested > 0) {
+      const int fps = std::max(20, std::min(120, requested));
+      const auto interval = std::chrono::nanoseconds(1000000000LL / fps);
+      const auto now = std::chrono::steady_clock::now();
+      if (deadline.time_since_epoch().count() == 0 || now > deadline + 2 * interval) deadline = now;
+      deadline += interval;
+      if (deadline > now) std::this_thread::sleep_until(deadline);
+    } else {
+      deadline = std::chrono::steady_clock::time_point();
+    }
     SDL_GL_SwapWindow(window);
   }
 
@@ -384,6 +400,7 @@ struct GLfunctions {
                                 SDL_WINDOW_OPENGL /* | SDL_RESIZABLE*/ |
                                 (fullscreen ? SDL_WINDOW_FULLSCREEN : 0));
     context = SDL_GL_CreateContext(window);
+    if (context) SDL_GL_SetSwapInterval(GetConfiguration()->GetBool("graphics_vsync", false) ? 1 : 0);
 
 
     //    *reinterpret_cast<void**>(&(mapping.func)) =

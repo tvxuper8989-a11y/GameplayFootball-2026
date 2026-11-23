@@ -410,12 +410,12 @@ int main(int argc, const char** argv) {
 
   // TTF_Font *defaultFont = TTF_OpenFont("media/fonts/archivonarrow/ArchivoNarrow-Regular.ttf", 28);
   // TTF_Font *defaultOutlineFont = TTF_OpenFont("media/fonts/archivonarrow/ArchivoNarrow-Regular.ttf", 28);
-  std::string fontfilename = config->Get("font_filename", "media/fonts/alegreya/AlegreyaSansSC-ExtraBold.ttf");
+  std::string fontfilename = config->Get("font_filename", "media/fonts/alegreya/AlegreyaSans-ExtraBold.ttf");
   TTF_Font *defaultFont = TTF_OpenFont(fontfilename.c_str(), 32);
   if (!defaultFont) Log(e_FatalError, "football", "main", "Could not load font " + fontfilename);
   TTF_Font *defaultOutlineFont = TTF_OpenFont(fontfilename.c_str(), 32);
   TTF_SetFontOutline(defaultOutlineFont, 2);
-  menuTask = boost::shared_ptr<MenuTask>(new MenuTask(5.0f / 4.0f, 0, defaultFont, defaultOutlineFont));
+  menuTask = boost::shared_ptr<MenuTask>(new MenuTask(config->GetInt("context_x", 1280) / static_cast<float>(std::max(1, config->GetInt("context_y", 720))), 0, defaultFont, defaultOutlineFont));
   if (controllers.size() > 1) menuTask->SetEventJoyButtons(static_cast<HIDGamepad*>(controllers.at(1))->GetControllerMapping(e_ControllerButton_A), static_cast<HIDGamepad*>(controllers.at(1))->GetControllerMapping(e_ControllerButton_B));
 
 
