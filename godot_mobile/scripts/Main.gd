@@ -460,3 +460,315 @@ func _unhandled_input(event: InputEvent) -> void:
 				_show_pause()
 	elif screen_name == "pausa" and event.keycode == KEY_ESCAPE:
 		_resume_match()
+
+func _clear_gui() -> void:
+	for child in gui.get_children():
+		gui.remove_child(child)
+		child.queue_free()
+	clock_label = null
+	score_label = null
+	notice_label = null
+
+func _panel(rect: Rect2, fill: Color, rounded: int = 12, border: Color = Color.TRANSPARENT) -> Panel:
+	var p: Panel = Panel.new()
+	p.position = rect.position
+	p.size = rect.size
+	var st: StyleBoxFlat = StyleBoxFlat.new()
+	st.bg_color = fill
+	st.corner_radius_top_left = rounded
+	st.corner_radius_top_right = rounded
+	st.corner_radius_bottom_left = rounded
+	st.corner_radius_bottom_right = rounded
+	st.border_color = border
+	if border.a > 0:
+		st.set_border_width_all(2)
+	p.add_theme_stylebox_override("panel", st)
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gui.add_child(p)
+	return p
+
+func _label(text_value: String, rect: Rect2, font_size: int = 22, ink: Color = Color.WHITE, center: bool = false) -> Label:
+	var l: Label = Label.new()
+	l.text = text_value
+	l.position = rect.position
+	l.size = rect.size
+	l.add_theme_font_size_override("font_size", font_size)
+	l.add_theme_color_override("font_color", ink)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER if center else HORIZONTAL_ALIGNMENT_LEFT
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gui.add_child(l)
+	return l
+
+func _button(text_value: String, rect: Rect2, callback: Callable, primary: bool = false) -> Button:
+	var b: Button = Button.new()
+	b.text = text_value
+	b.position = rect.position
+	b.size = rect.size
+	b.add_theme_font_size_override("font_size", 19)
+	b.add_theme_color_override("font_color", Color("#d8f5f6"))
+	b.add_theme_color_override("font_hover_color", Color.WHITE)
+	var normal: StyleBoxFlat = StyleBoxFlat.new()
+	normal.bg_color = Color("#127d85") if primary else Color("#11394b")
+	normal.border_color = Color("#27d6be") if primary else Color("#35788b")
+	normal.set_border_width_all(2)
+	normal.set_corner_radius_all(11)
+	var hover: StyleBoxFlat = normal.duplicate()
+	hover.bg_color = Color("#1eac9b")
+	var pressed: StyleBoxFlat = normal.duplicate()
+	pressed.bg_color = Color("#0c7e6d")
+	b.add_theme_stylebox_override("normal", normal)
+	b.add_theme_stylebox_override("hover", hover)
+	b.add_theme_stylebox_override("pressed", pressed)
+	b.pressed.connect(callback)
+	gui.add_child(b)
+	return b
+
+func _add_title(title: String, subtitle: String) -> void:
+	_panel(Rect2(0, 0, 1280, 82), Color("#091c2ce8"), 0)
+	_panel(Rect2(38, 24, 7, 35), Color("#2be0c3"), 0)
+	_label(title, Rect2(62, 13, 800, 43), 31)
+	_label(subtitle, Rect2(62, 52, 900, 23), 15, Color("#8eccd0"))
+	_label("GAMEPLAY FOOTBALL  ·  2026 / 2027", Rect2(940, 18, 310, 40), 16, Color("#46e6c9"), true)
+
+func _fill_menu() -> void:
+	_clear_gui()
+	_panel(Rect2(0, 0, 1280, 720), Color(0.015, 0.043, 0.073, 0.91), 0)
+
+func _show_home() -> void:
+	screen_name = "inicio"
+	running = false
+	_fill_menu()
+	_add_title("GAMEPLAY FOOTBALL", "VERSIÓN 3D  ·  ANDROID  ·  ESPAÑOL")
+	_label("EL FÚTBOL", Rect2(80, 138, 660, 92), 66)
+	_label("EMPIEZA ACÁ.", Rect2(80, 229, 760, 95), 66, Color("#35edc9"))
+	_label("Elegí tus equipos, armá la táctica y jugá un partido 3D.", Rect2(86, 333, 760, 48), 23, Color("#c6e2eb"))
+	_button("▶  JUGAR PARTIDO", Rect2(83, 424, 337, 76), func(): _show_select(), true)
+	_button("PLANES DE JUEGO", Rect2(437, 424, 290, 76), func(): _show_lineup())
+	_button("CONFIGURACIÓN", Rect2(83, 521, 300, 67), func(): _show_settings())
+	_button("CÓMO SE JUEGA", Rect2(403, 521, 324, 67), func(): _show_help())
+	_panel(Rect2(822, 157, 360, 380), Color("#0a2e40bb"), 23, Color("#218a91"))
+	_label("TEMPORADA", Rect2(864, 189, 275, 50), 27, Color("#b0d4df"), true)
+	_label("26", Rect2(849, 247, 301, 146), 139, Color("#eafaff"), true)
+	_panel(Rect2(864, 425, 267, 4), Color("#23dab8"), 0)
+	_label("FOOTBALL 2026 / 27", Rect2(859, 457, 284, 36), 24, Color("#32edc8"), true)
+	_label("FLECHAS  ·  S PASE  ·  D REMATE  ·  Q CAMBIAR", Rect2(87, 651, 1070, 38), 18, Color("#9ac4d2"))
+
+func _change_team(side: int, direction: int) -> void:
+	var id_value: int = team_home if side == 0 else team_away
+	id_value = posmod(id_value + direction, TEAM_NAMES.size())
+	if side == 0:
+		team_home = id_value
+		if team_home == team_away:
+			team_away = posmod(team_away + 1, TEAM_NAMES.size())
+	else:
+		team_away = id_value
+		if team_home == team_away:
+			team_home = posmod(team_home + 1, TEAM_NAMES.size())
+	_show_select()
+
+func _show_select() -> void:
+	screen_name = "equipos"
+	_fill_menu()
+	_add_title("ELEGIR EQUIPOS", "PARTIDO RÁPIDO  /  MODO LOCAL CONTRA IA")
+	_button("‹ VOLVER", Rect2(40, 615, 215, 56), func(): _show_home())
+	_panel(Rect2(120, 143, 452, 405), Color("#0b2c42"), 22, Color("#278a96"))
+	_panel(Rect2(710, 143, 452, 405), Color("#0b2c42"), 22, Color("#278a96"))
+	_label("LOCAL", Rect2(200, 161, 290, 41), 21, Color("#35eac3"), true)
+	_label("VISITANTE", Rect2(790, 161, 290, 41), 21, Color("#35eac3"), true)
+	_label(ABBREVIATIONS[team_home], Rect2(226, 208, 248, 148), 88, Color("#c7f8fa"), true)
+	_label(ABBREVIATIONS[team_away], Rect2(816, 208, 248, 148), 88, Color("#eacd77"), true)
+	_label(TEAM_NAMES[team_home], Rect2(154, 363, 390, 70), 25, Color.WHITE, true)
+	_label(TEAM_NAMES[team_away], Rect2(743, 363, 390, 70), 25, Color.WHITE, true)
+	_label("VS", Rect2(578, 260, 115, 100), 54, Color("#e7fff4"), true)
+	_button("◀", Rect2(192, 459, 107, 54), func(): _change_team(0, -1))
+	_button("▶", Rect2(396, 459, 107, 54), func(): _change_team(0, 1))
+	_button("◀", Rect2(782, 459, 107, 54), func(): _change_team(1, -1))
+	_button("▶", Rect2(986, 459, 107, 54), func(): _change_team(1, 1))
+	_button("CONTINUAR  ›", Rect2(900, 607, 300, 66), func(): _show_lineup(), true)
+
+func _show_lineup() -> void:
+	screen_name = "tactica"
+	_fill_menu()
+	_add_title("PLAN DE JUEGO", "FORMACIONES Y POSICIONES REALES DEL PARTIDO")
+	_panel(Rect2(75, 124, 695, 526), Color("#092f35"), 12, Color("#2c9291"))
+	_panel(Rect2(116, 169, 620, 424), Color("#145c48"), 0)
+	_panel(Rect2(429, 169, 2, 424), Color("#8ed7be"), 0)
+	_panel(Rect2(116, 169, 620, 2), Color("#8ed7be"), 0)
+	_panel(Rect2(116, 591, 620, 2), Color("#8ed7be"), 0)
+	var positions: Array[Vector2] = _positions(formation_name)
+	for i in range(positions.size()):
+		var pos: Vector2 = positions[i]
+		var px: float = 136 + (pos.x + 52.5) / 105.0 * 576.0
+		var py: float = 193 + (pos.y + 34) / 68.0 * 378.0
+		_panel(Rect2(px - 24, py - 23, 48, 46), Color("#163f4d"), 13, Color("#d3c581"))
+		_label("%d" % (i + 1), Rect2(px - 20, py - 23, 40, 44), 22, Color("#effefa"), true)
+	_panel(Rect2(804, 127, 397, 520), Color("#0e2a40"), 20, Color("#25607b"))
+	_label("FORMACIÓN", Rect2(833, 163, 325, 49), 31)
+	_label(formation_name, Rect2(833, 210, 320, 90), 62, Color("#2af0c7"))
+	_label("Elegí cómo se distribuyen tus jugadores.\nLos compañeros seguirán este esquema\ndurante el partido.", Rect2(830, 309, 340, 115), 21, Color("#bfd9e0"))
+	var forms: Array[String] = ["4-3-3", "4-4-2", "3-5-2"]
+	for i in range(3):
+		var choice: String = forms[i]
+		_button(choice, Rect2(817 + i * 122, 464, 113, 60), func(): _set_formation(choice), choice == formation_name)
+	_button("CONTINUAR", Rect2(827, 552, 345, 66), func(): _show_intro(), true)
+	_button("‹ VOLVER", Rect2(76, 661, 210, 45), func(): _show_home())
+
+func _show_intro() -> void:
+	screen_name = "presentacion"
+	_fill_menu()
+	_add_title("CARA A CARA", "ESTADIO METROPOLITANO  ·  PARTIDO DE EXHIBICIÓN")
+	_panel(Rect2(82, 164, 430, 337), Color("#11354a"), 20, Color("#3c9caa"))
+	_panel(Rect2(762, 164, 430, 337), Color("#11354a"), 20, Color("#3c9caa"))
+	_label(ABBREVIATIONS[team_home], Rect2(176, 188, 245, 152), 95, Color("#bfe8fc"), true)
+	_label(ABBREVIATIONS[team_away], Rect2(854, 188, 245, 152), 95, Color("#f0d57e"), true)
+	_label(TEAM_NAMES[team_home], Rect2(112, 369, 373, 64), 25, Color.WHITE, true)
+	_label(TEAM_NAMES[team_away], Rect2(798, 369, 366, 64), 25, Color.WHITE, true)
+	_label("VS", Rect2(528, 274, 220, 120), 78, Color("#2ff0cb"), true)
+	_label("LOCAL", Rect2(201, 450, 195, 34), 17, Color("#8ad9d4"), true)
+	_label("VISITANTE", Rect2(887, 450, 195, 34), 17, Color("#8ad9d4"), true)
+	_label("ESQUEMA " + formation_name + "  ·  90 MINUTOS DE JUEGO", Rect2(366, 528, 550, 48), 24, Color("#bfd5df"), true)
+	_button("‹ VOLVER", Rect2(118, 611, 230, 57), func(): _show_lineup())
+	_button("▶  COMENZAR PARTIDO", Rect2(794, 602, 371, 75), func(): _start_match(), true)
+
+func _show_help() -> void:
+	_fill_menu()
+	screen_name = "ayuda"
+	_add_title("CONTROLES", "CONSEJOS PARA ANDROID Y PC")
+	_label("ANDROID", Rect2(90, 145, 420, 52), 34, Color("#28edc4"))
+	_label("JoystICK izquierdo: mover al jugador.\nPASE: pasar al compañero.\nREMATE: disparar.\nCAMBIAR: elegir el jugador más cercano.\nCORRER: mantener presionado.", Rect2(92, 220, 650, 268), 25)
+	_label("TECLADO", Rect2(725, 145, 420, 52), 34, Color("#28edc4"))
+	_label("Flechas: moverse.\nS: pase.    D: remate.\nQ: cambiar jugador.    E: correr.\nEsc: pausa.", Rect2(727, 220, 470, 240), 25)
+	_button("VOLVER AL INICIO", Rect2(458, 572, 363, 71), func(): _show_home(), true)
+
+func _show_settings() -> void:
+	screen_name = "ajustes"
+	_fill_menu()
+	_add_title("CONFIGURACIÓN", "AJUSTES DE RENDIMIENTO PARA ANDROID")
+	_label("LÍMITE DE FOTOGRAMAS", Rect2(124, 166, 570, 60), 32)
+	_label("Los FPS reales dependen de la GPU y la pantalla del teléfono.", Rect2(124, 220, 795, 45), 20, Color("#95c1cb"))
+	for i in range(3):
+		var choice: int = [30, 60, 120][i]
+		_button(str(choice) + " FPS", Rect2(124 + i * 257, 305, 231, 70),
+			func(): _change_fps(choice), choice == fps_target)
+	_label("CÁMARA", Rect2(124, 430, 420, 47), 31)
+	for i in range(3):
+		var camera_name: String = ["TV", "TÁCTICA", "DINÁMICA"][i]
+		_button(camera_name, Rect2(124 + i * 257, 504, 231, 62),
+			func(): _set_camera(camera_name), camera_name == camera_mode)
+	_button("VOLVER", Rect2(124, 615, 300, 64), func(): _show_home(), true)
+
+func _change_fps(fps: int) -> void:
+	fps_target = fps
+	Engine.max_fps = fps
+	_show_settings()
+
+func _set_camera(mode: String) -> void:
+	camera_mode = mode
+	_show_settings()
+
+func _show_hud() -> void:
+	_clear_gui()
+	_panel(Rect2(24, 18, 456, 72), Color("#061c2aeb"), 12, Color("#1a9b95"))
+	_label(ABBREVIATIONS[team_home], Rect2(35, 23, 115, 58), 26, Color("#c8f7fc"), true)
+	score_label = _label("%d  :  %d" % scoreboard, Rect2(146, 23, 159, 58), 32, Color.WHITE, true)
+	_label(ABBREVIATIONS[team_away], Rect2(304, 23, 104, 58), 26, Color("#ffe6ab"), true)
+	clock_label = _label("00:00", Rect2(401, 24, 81, 57), 21, Color("#29f2be"), true)
+	_panel(Rect2(855, 20, 396, 65), Color("#062a38d7"), 12, Color("#1b8d9b"))
+	_button("CÁMARA", Rect2(865, 28, 131, 49), func(): _cycle_camera())
+	_button("TÁCTICA", Rect2(1006, 28, 130, 49), func(): _show_pause())
+	_button("☰", Rect2(1147, 28, 94, 49), func(): _show_pause())
+	_panel(Rect2(16, 638, 478, 53), Color("#092c3abb"), 12)
+	_label("JOYSTICK  ·  CONTROL DEL JUGADOR", Rect2(37, 639, 432, 52), 17, Color("#b2e5e9"))
+	notice_label = _label("", Rect2(364, 120, 552, 69), 39, Color("#28f9bf"), true)
+	var j: Control = Control.new()
+	j.set_script(load("res://scripts/Joystick.gd"))
+	j.position = Vector2(63, 440)
+	j.size = Vector2(176, 176)
+	gui.add_child(j)
+	j.connect("direction_changed", Callable(self, "_set_joystick_dir"))
+	_button("PASE", Rect2(1005, 497, 118, 84), func(): _pass_ball(), true)
+	_button("REMATE", Rect2(1135, 381, 126, 89), func(): _shoot_ball(), true)
+	_button("CAMBIAR", Rect2(872, 573, 130, 85), func(): _switch_player())
+	var sprint_button: Button = _button("CORRER", Rect2(1128, 575, 133, 91), func(): pass, true)
+	sprint_button.button_down.connect(func(): pressed_sprint = true)
+	sprint_button.button_up.connect(func(): pressed_sprint = false)
+
+func _set_joystick_dir(value: Vector2) -> void:
+	joystick_dir = value
+
+func _cycle_camera() -> void:
+	if camera_mode == "TV":
+		camera_mode = "TÁCTICA"
+	elif camera_mode == "TÁCTICA":
+		camera_mode = "DINÁMICA"
+	else:
+		camera_mode = "TV"
+	_notice("CÁMARA: " + camera_mode)
+
+func _notice(message: String, duration: float = 1.0) -> void:
+	notice_timer = duration
+	if is_instance_valid(notice_label):
+		notice_label.text = message
+
+func _show_pause() -> void:
+	if screen_name != "partido":
+		return
+	screen_name = "pausa"
+	running = false
+	pressed_sprint = false
+	joystick_dir = Vector2.ZERO
+	_fill_menu()
+	_add_title("PARTIDO EN PAUSA", "ESTADIO METROPOLITANO")
+	_label(ABBREVIATIONS[team_home] + "  " + str(scoreboard[0]) + "  -  " +
+		str(scoreboard[1]) + "  " + ABBREVIATIONS[team_away], Rect2(270, 160, 750, 110), 62, Color("#ddfff5"), true)
+	_button("▶  CONTINUAR", Rect2(452, 315, 365, 69), func(): _resume_match(), true)
+	_button("CAMBIAR CÁMARA: " + camera_mode, Rect2(451, 406, 367, 66), func(): _cycle_camera_pause())
+	_button("CAMBIAR FORMACIÓN: " + formation_name, Rect2(451, 489, 367, 66), func(): _cycle_formation_pause())
+	_button("SALIR DEL PARTIDO", Rect2(451, 576, 367, 64), func(): _show_home())
+
+func _cycle_camera_pause() -> void:
+	_cycle_camera()
+	_show_pause_repaint()
+
+func _show_pause_repaint() -> void:
+	screen_name = "partido"
+	_show_pause()
+
+func _cycle_formation_pause() -> void:
+	if formation_name == "4-3-3":
+		formation_name = "4-4-2"
+	elif formation_name == "4-4-2":
+		formation_name = "3-5-2"
+	else:
+		formation_name = "4-3-3"
+	var poses: Array[Vector2] = _positions(formation_name)
+	for i in range(players.size()):
+		var pi: int = i % 11
+		var team_side: int = players[i]["side"]
+		var pos: Vector2 = poses[pi]
+		players[i]["start"] = Vector3(pos.x if team_side == 0 else -pos.x, 0,
+			pos.y if team_side == 0 else -pos.y)
+	_show_pause_repaint()
+
+func _resume_match() -> void:
+	screen_name = "partido"
+	running = true
+	_show_hud()
+
+func _show_results() -> void:
+	screen_name = "resultado"
+	_fill_menu()
+	_add_title("FINAL DEL PARTIDO", "RESUMEN DEL ENCUENTRO")
+	_label(TEAM_NAMES[team_home], Rect2(115, 183, 455, 68), 32, Color.WHITE, true)
+	_label(TEAM_NAMES[team_away], Rect2(710, 183, 455, 68), 32, Color.WHITE, true)
+	_label("%d   -   %d" % scoreboard, Rect2(375, 283, 536, 152), 110, Color("#33efca"), true)
+	var headline: String = "EMPATE"
+	if scoreboard[0] > scoreboard[1]:
+		headline = "VICTORIA LOCAL"
+	elif scoreboard[1] > scoreboard[0]:
+		headline = "VICTORIA VISITANTE"
+	_label(headline, Rect2(392, 456, 495, 66), 35, Color("#e9fbf5"), true)
+	_button("REVANCHA", Rect2(304, 594, 320, 76), func(): _start_match(), true)
+	_button("INICIO", Rect2(654, 594, 320, 76), func(): _show_home())
